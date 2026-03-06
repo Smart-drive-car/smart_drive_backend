@@ -1,6 +1,8 @@
 
 from pathlib import Path
 from os import getenv
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,15 +22,20 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+AUTH_USER_MODEL = 'apps.users.User'
+
 apps = [
     'apps.users',
+    'apps.shared',
+    'apps.vehicles',
 ]
 
 libs = [
-
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
-INSTALLED_APPS = [
+default_libs = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -36,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+INSTALLED_APPS = default_libs + libs + apps
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -108,7 +117,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-
+MEDIA_URL = '/media/'
 
 
 DB_ENGINE = getenv('DB_ENGINE')
@@ -128,4 +137,13 @@ DATABASES = {
         'HOST': DB_HOST,
         'PORT': DB_PORT,
     }
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
