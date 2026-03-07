@@ -1,12 +1,20 @@
 
 from pathlib import Path
+import os
 from os import getenv
 from dotenv import load_dotenv
 load_dotenv()
+import firebase_admin
+from firebase_admin import credentials
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Path to your downloaded JSON file
+cred = credentials.Certificate(f"{BASE_DIR}/firebase/firebase_credentials.json")
+firebase_admin.initialize_app(cred)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -22,7 +30,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-AUTH_USER_MODEL = 'apps.users.User'
+AUTH_USER_MODEL = 'users.User'
 
 apps = [
     'apps.users',
@@ -33,6 +41,8 @@ apps = [
 libs = [
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+    'drf_spectacular',
 ]
 
 default_libs = [
@@ -118,6 +128,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 MEDIA_URL = '/media/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 DB_ENGINE = getenv('DB_ENGINE')
@@ -126,6 +138,8 @@ DB_USER = getenv('DB_USER')
 DB_PASSWORD = getenv('DB_PASSWORD')
 DB_HOST = getenv('DB_HOST')
 DB_PORT = getenv('DB_PORT')
+ESKIZ_EMAIL = getenv('ESKIZ_EMAIL')
+ESKIZ_SECRET_KEY = getenv('ESKIZ_SECRET_KEY')
 
 
 DATABASES = {
@@ -140,10 +154,17 @@ DATABASES = {
 }
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    ],
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'SmartDrive API',
+    'VERSION': '1.0.0',
 }
