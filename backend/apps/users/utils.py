@@ -2,7 +2,7 @@ import requests
 import random
 from django.utils import timezone
 from datetime import timedelta
-from .models import OtpCode
+from .models import OtpCode, User
 
 from django.core.cache import cache
 from django.conf import settings
@@ -46,3 +46,32 @@ def send_eskiz_sms(phone, message):
         return response.json()
     except Exception as e:
         return {"status": "error", "message": f"Send failed: {str(e)}"}
+    
+
+
+
+DEVSMS_TOKEN = '9e7f396445052ebef55cbc06107bc39374ec9bbff06d21782d9ea783f1a559c6'
+
+def send_sms(phone_number):
+
+    otp = random.randint(100000, 999999)    
+
+    url = "https://devsms.uz/api/send_sms.php"
+    headers = {
+        "Authorization": f"Bearer {DEVSMS_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "phone": "998" + phone_number,
+        "message": f"SmartDrive tasdiqlash kodi: {otp}",
+    }
+    response = requests.post(url, headers=headers, json=data)
+
+    return otp
+
+
+#sample usage
+if __name__ == "__main__":
+    phone_number = "998931680043"
+    response = send_sms(phone_number)
+    print(response)

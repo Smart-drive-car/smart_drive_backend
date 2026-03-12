@@ -30,6 +30,9 @@ db.sqlite3-journal
 /media
 /staticfiles
 /static
+firebase/
+firebase_credentials.json
+
 
 # Django migrations (optional - uncomment if you want to ignore)
 # **/migrations/*.py

@@ -46,6 +46,21 @@ class AdminProfileLoginSerializer(serializers.ModelSerializer):
         model = AdminProfile
         fields = ['full_name']
 
+class UserDetailSerializer(serializers.ModelSerializer):
+    profile = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['phone_number', 'role', 'profile']
+
+    def get_profile(self, obj):
+        if obj.role == Role.DRIVER:
+            return DriverProfileLoginSerializer(getattr(obj, 'driverprofile', None)).data
+        elif obj.role == Role.WORKSHOP:
+            return WorkshopProfileLoginSerializer(getattr(obj, 'workshopprofile', None)).data
+        elif obj.role == Role.ADMIN:
+            return AdminProfileLoginSerializer(getattr(obj, 'admin_profile', None)).data
+        return None
 
 
 # --- Main JWT Serializer ---
@@ -149,37 +164,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
             return user
 
 
-class FirebaseVerifySerializer(serializers.Serializer):
-    id_token = serializers.CharField(required=True)
-    phone_number = serializers.CharField(required=True)
-
-    def validate_phone_number(self, value):
-        """
-        Cleans '+998901234567' or '998901234567' into your model's 9-digit format.
-        """
-        # Extract the last 9 digits to match your regex: r'^\d{9}$'
-        clean_phone = re.sub(r'\D', '', value) # Remove all non-digits
-        if len(clean_phone) >= 9:
-            return clean_phone[-9:]
-        raise serializers.ValidationError("Phone number must contain at least 9 digits.")
-
-    def validate(self, data):
-        """
-        Verifies the ID Token with Firebase and checks it matches the user.
-        """
-        try:
-            decoded_token = firebase_auth.verify_id_token(data['id_token'])
-            firebase_phone = decoded_token.get('phone_number', '')
-            
-            # Basic security: Does the token phone match the provided phone?
-            if data['phone_number'] not in firebase_phone:
-                raise serializers.ValidationError("Phone number mismatch with Firebase token.")
-            
-            data['firebase_uid'] = decoded_token.get('uid')
-            return data
-        except Exception:
-            raise serializers.ValidationError("Invalid or expired Firebase token.")
-
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -211,73 +195,31 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 
-class PasswordResetSerializer(serializers.Serializer):
-    phone_number = serializers.CharField()
-    id_token = serializers.CharField()
-    new_password = serializers.CharField(min_length=8, write_only=True)
-    password_confirm = serializers.CharField(write_only=True)
-
-    def validate(self, attrs):
-        # 1. Check passwords match
-        if attrs['new_password'] != attrs['password_confirm']:
-            raise serializers.ValidationError({"password_confirm": "Passwords do not match."})
-
-        # 2. Verify Firebase Token
-        try:
-            decoded_token = auth.verify_id_token(attrs['id_token'])
-            firebase_phone = decoded_token.get('phone_number')
-            
-            # Basic security check: Does the token phone match the requested phone?
-            # Note: Firebase phone is usually +998XXXXXXXXX
-            if not firebase_phone or attrs['phone_number'] not in firebase_phone:
-                raise serializers.ValidationError("Phone number does not match Firebase token.")
-                
-        except Exception:
-            raise serializers.ValidationError("Invalid or expired Firebase token.")
-
-        return attrs
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    reset_token = serializers.CharField(required=True)
+    new_password = serializers.CharField(write_only=True, min_length=8, style={'input_type': 'password'})
 
 
-class RegisterSerializer(serializers.Serializer):
-    # Common Fields
+class SendOtpSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)
-    password = serializers.CharField(write_only=True)
-    password_confirm = serializers.CharField(write_only=True)
-    role = serializers.ChoiceField(choices=[Role.DRIVER, Role.WORKSHOP], default=Role.DRIVER)
 
-    # Driver Specific Fields
-    full_name = serializers.CharField(required=False, allow_blank=True)
-    car_plate_number = serializers.CharField(required=False, allow_blank=True)
-    vehicle_model_id = serializers.IntegerField(required=False)
-
-    # Workshop Specific Fields
-    title = serializers.CharField(required=False, allow_blank=True)
-    address = serializers.CharField(required=False, allow_blank=True)
-
-    def validate(self, data):
-        # 1. Check Passwords
-        if data['password'] != data['password_confirm']:
-            raise serializers.ValidationError({"password": "Passwords do not match."})
-
-        # 2. Check if User already exists
-        if User.objects.filter(phone_number=data['phone_number']).exists():
-            raise serializers.ValidationError({"phone_number": "This phone number is already registered."})
-
-        # 3. Role-based mandatory field validation
-        if data['role'] == Role.DRIVER:
-            if not data.get('full_name') or not data.get('car_plate_number'):
-                raise serializers.ValidationError("Drivers must provide name and plate number.")
-        
-        if data['role'] == Role.WORKSHOP:
-            if not data.get('title') or not data.get('address'):
-                raise serializers.ValidationError("Workshops must provide title and address.")
-
-        return data
-
+    def validate_phone_number(self, value):
+        """
+        Cleans '+998901234567' or '998901234567' into your model's 9-digit format.
+        """
+        # Extract the last 9 digits to match your regex: r'^\d{9}$'
+        clean_phone = re.sub(r'\D', '', value) # Remove all non-digits
+        if len(clean_phone) >= 9:
+            return clean_phone[-9:]
+        raise serializers.ValidationError("Phone number must contain at least 9 digits.")
 
 class RegisterConfirmSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)
     code = serializers.CharField(max_length=6)   
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(max_length=20)
     
 
 class TestRegisterSerializer(serializers.Serializer):
