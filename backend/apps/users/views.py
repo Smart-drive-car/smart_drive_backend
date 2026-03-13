@@ -237,6 +237,15 @@ class PasswordResetConfirmView(GenericAPIView):
 
         return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
 
+
+class UserDetailView(GenericAPIView):
+    serializer_class = UserDetailSerializer
+
+    def get(self, request):
+        user = request.user
+        serializer = self.get_serializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 # class TestRegisterView(APIView):
 #     """
 #     Step 2: Check OTP and finally create User + Profile.

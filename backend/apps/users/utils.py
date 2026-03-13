@@ -1,3 +1,5 @@
+import os
+
 import requests
 import random
 from django.utils import timezone
@@ -50,7 +52,7 @@ def send_eskiz_sms(phone, message):
 
 
 
-DEVSMS_TOKEN = '9e7f396445052ebef55cbc06107bc39374ec9bbff06d21782d9ea783f1a559c6'
+DEVSMS_TOKEN = os.getenv('DEVSMS_TOKEN')
 
 def send_sms(phone_number):
 
@@ -63,10 +65,11 @@ def send_sms(phone_number):
     }
     data = {
         "phone": "998" + phone_number,
-        "message": f"SmartDrive tasdiqlash kodi: {otp}",
+        "message": "Assalomu alaykum, tizimimizga xush kelibsiz!1",
+        # "message": f"SmartDrive tasdiqlash kodi: {otp}",
     }
     response = requests.post(url, headers=headers, json=data)
-
+    print(response.json())
     return otp
 
 
