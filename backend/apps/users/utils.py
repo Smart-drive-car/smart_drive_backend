@@ -4,7 +4,7 @@ import requests
 import random
 from django.utils import timezone
 from datetime import timedelta
-from .models import OtpCode, User
+from .models import User
 
 from django.core.cache import cache
 from django.conf import settings

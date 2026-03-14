@@ -50,7 +50,6 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    is_verified = models.BooleanField(default=False)  # For OTP verification status
 
     objects = UserManager()
     
@@ -102,16 +101,16 @@ class AdminProfile(BaseModel):
 def get_otp_expiry():
     return timezone.now() + timezone.timedelta(minutes=5)
 
-class OtpCode(BaseModel):
-    user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='otp_codes')
-    code       = models.CharField(max_length=6)
-    is_used    = models.BooleanField(default=False)
-    attempts   = models.PositiveSmallIntegerField(default=0)
-    expires_at = models.DateTimeField(default=get_otp_expiry)
-    created_at = models.DateTimeField(auto_now_add=True)
+class OtpVerification(BaseModel):
+    phone_number = models.CharField(max_length=20)
+    code         = models.CharField(max_length=6)
+    is_used      = models.BooleanField(default=False)
+    attempts     = models.PositiveSmallIntegerField(default=0)
+    expires_at   = models.DateTimeField(default=get_otp_expiry)
+    created_at   = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = "otp_codes"
+        db_table = "otp_verifications"
         ordering = ["-created_at"]
 
     def is_expired(self):
@@ -121,20 +120,15 @@ class OtpCode(BaseModel):
         return not self.is_used and not self.is_expired() and self.attempts < 3
 
     def __str__(self):
-        return f"{self.user.phone_number} — {self.code} ({'used' if self.is_used else 'active'})"
+        return f"{self.phone_number} — {self.code} ({'used' if self.is_used else 'active'})"
 
 
 
-class UserPasswordReset(models.Model): # Use models.Model unless you have a specific BaseModel
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='password_reset')
-    reset_token = models.UUIDField(default=uuid.uuid4, unique=True, null=True, blank=True)
-    reset_token_created_at = models.DateTimeField(auto_now=True)
-    code = models.CharField(max_length=6, null=True, blank=True)
-    incorrect_count = models.IntegerField(default=0)
-    otp_count = models.IntegerField(default=0)
-    verified = models.BooleanField(default=False)
+class UserPasswordReset(models.Model):
+    user        = models.OneToOneField(User, on_delete=models.CASCADE, related_name='password_reset')
+    reset_token = models.UUIDField(default=uuid.uuid4, unique=True)
+    created_at  = models.DateTimeField(auto_now_add=True)
 
     @property
-    def is_token_valid(self):
-        # Token is valid for 15 minutes
-        return self.reset_token_created_at > timezone.now() - timezone.timedelta(minutes=15)
+    def is_valid(self):
+        return self.created_at > timezone.now() - timezone.timedelta(minutes=15)

@@ -136,8 +136,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 phone_number=phone,
                 password=password,
                 role=role,
-                is_active=False,
-                is_verified=False
+                is_active=True,
             )
 
             # 2. Create specific Profile and handle images
@@ -166,10 +165,18 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+
+    def validate_phone_number(self, value):
+        clean_phone = re.sub(r'\D', '', value) # Remove all non-digits
+        if len(clean_phone) >= 9: # Ensure it has at least 9 digits
+            return clean_phone[-9:] # Return the last 9 digits    
+        raise serializers.ValidationError("Phone number must contain at least 9 digits.")
+
     def validate(self, attrs):
         # 1. Get standard JWT data (access & refresh tokens)
         data = super().validate(attrs)
-
+        
+        
         # 2. Add user base info
         user = self.user
         data['user'] = {
@@ -217,10 +224,25 @@ class RegisterConfirmSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)
     code = serializers.CharField(max_length=6)   
 
+    def validate_phone_number(self, value):
+        """
+        Cleans '+998901234567' or '998901234567' into your model's 9-digit format.
+        """
+        # Extract the last 9 digits to match your regex: r'^\d{9}$'
+        clean_phone = re.sub(r'\D', '', value) # Remove all non-digits
+        if len(clean_phone) >= 9:
+            return clean_phone[-9:]
+        raise serializers.ValidationError("Phone number must contain at least 9 digits.")
+
 
 class ForgotPasswordSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)
-    
+
+    def validate_phone_number(self, value):
+        clean_phone = re.sub(r'\D', '', value)
+        if len(clean_phone) >= 9:
+            return clean_phone[-9:]
+        raise serializers.ValidationError("Phone number must contain at least 9 digits.")
 
 class TestRegisterSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)

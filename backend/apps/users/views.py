@@ -1,5 +1,6 @@
 
 
+import re
 import uuid
 
 from django.utils import timezone
@@ -13,7 +14,7 @@ from .serializers import CustomTokenObtainPairSerializer, ForgotPasswordSerializ
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import AllowAny
 from django.core.cache import cache
-from .models import OtpCode, User, Role, DriverProfile, UserPasswordReset, WorkshopProfile
+from .models import OtpVerification, User, Role, DriverProfile, UserPasswordReset, WorkshopProfile
 from .serializers import TestRegisterSerializer, RegistrationSerializer, PasswordResetConfirmSerializer
 from .utils import send_eskiz_sms, send_sms
 from django.db import transaction
@@ -28,6 +29,8 @@ class LoginView(TokenObtainPairView):
     permission_classes = [AllowAny]
 
 
+
+
 class RegisterView(GenericAPIView):
     parser_classes = (MultiPartParser, FormParser) # Necessary for images
     permission_classes = [AllowAny]
@@ -37,25 +40,31 @@ class RegisterView(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            otp = send_sms(serializer.validated_data['phone_number'])
-            if otp:
+            phone = serializer.validated_data['phone_number']
 
-                otp_code = OtpCode.objects.update_or_create(
-                    user=user,
-                    defaults={
-                        "code": otp,
-                        "attempts": 0,
-                        "is_used": False
-                    }
+            # Ensure phone number was verified before registration
+            verified_otp = OtpVerification.objects.filter(phone_number=phone, is_used=True).first()
+            if not verified_otp:
+                return Response(
+                    {"error": "Phone number must be verified before registering."},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
 
+            user = serializer.save()
+
+            # Invalidate the used OTP record
+            verified_otp.delete()
+
+            refresh = RefreshToken.for_user(user)
             return Response({
-                "message": "User created successfully. Please verify your phone number to activate account.",
-                "phone_number": serializer.validated_data['phone_number'],
-                "sms_result": otp
+                "message": "User registered successfully.",
+                "tokens": {
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                },
+                "user": UserDetailSerializer(user).data
             }, status=status.HTTP_201_CREATED)
-        
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -67,16 +76,12 @@ class SendOtpView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             phone = serializer.validated_data['phone_number']
-            user = User.objects.filter(phone_number=phone).first()
-            if not user:
-                return Response({"error": "User with this phone number not found."}, status=status.HTTP_404_NOT_FOUND)
-            
-            otp = send_sms(phone)
-            
-            if otp:
 
-                otp_code = OtpCode.objects.update_or_create(
-                    user=user,
+            otp = send_sms(phone)
+
+            if otp:
+                OtpVerification.objects.update_or_create(
+                    phone_number=phone,
                     defaults={
                         "code": otp,
                         "expires_at": timezone.now() + timezone.timedelta(minutes=5),
@@ -84,9 +89,9 @@ class SendOtpView(GenericAPIView):
                         "is_used": False
                     }
                 )
-            
+
             return Response({"message": "OTP sent successfully.", "otp_code": otp}, status=status.HTTP_200_OK)
-        
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -99,37 +104,15 @@ class VerifyOtpView(GenericAPIView):
         if serializer.is_valid():
             phone = serializer.validated_data['phone_number']
             code = serializer.validated_data['code']
-            
-            try:
-                user = User.objects.get(phone_number=phone)
-                otp_code = OtpCode.objects.filter(user=user, code=code, is_used=False).first()
-                
-                
-                if otp_code and otp_code.is_valid():
-                    user.is_verified = True
-                    user.is_active = True
-                    user.save()
-                    
-                    otp_code.is_used = True
-                    otp_code.save()
-                    
-                    refresh = RefreshToken.for_user(user)
 
-                    user_data = UserDetailSerializer(user).data
+            otp_record = OtpVerification.objects.filter(phone_number=phone, code=code, is_used=False).first()
 
-
-                    return Response({
-                        "tokens": {
-                            "refresh": str(refresh),
-                            "access": str(refresh.access_token),
-                        },
-                        "user": user_data
-                        }, status=status.HTTP_200_OK)
-                else:
-                    return Response({"error": "Invalid or expired OTP code."}, status=400)
-            
-            except User.DoesNotExist:
-                return Response({"error": "User with this phone number not found."}, status=404)
+            if otp_record and otp_record.is_valid():
+                otp_record.is_used = True
+                otp_record.save()
+                return Response({"message": "Phone number verified successfully."}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Invalid or expired OTP code."}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -143,34 +126,28 @@ class ForgotPasswordView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             phone = serializer.validated_data['phone_number']
-            
-            try:
-                user = User.objects.get(phone_number=phone)
-                otp = send_sms(phone)
-                
-                if otp:
 
-                    password_reset = UserPasswordReset.objects.update_or_create(
-                        user=user,
-                        defaults={
-                            "code":otp,
-                            "reset_token": str(uuid.uuid4()),
-                            "reset_token_created_at": timezone.now(),
-                            "incorrect_count": 0,
-                            "otp_count": 0,
-                            "verified": False
-                        }
-                    )
-                
-                return Response({
-                    "message": "Password reset instructions have been sent to your phone number.",
-                    "otp_code": otp
-                }, status=status.HTTP_200_OK)
-                
-            except User.DoesNotExist:
-                return Response({"error": "User with this phone number not found."}, status=404)
+            if not User.objects.filter(phone_number=phone).exists():
+                return Response({"error": "User with this phone number not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
+            otp = send_sms(phone)
+            if otp:
+                OtpVerification.objects.update_or_create(
+                    phone_number=phone,
+                    defaults={
+                        "code": otp,
+                        "expires_at": timezone.now() + timezone.timedelta(minutes=5),
+                        "attempts": 0,
+                        "is_used": False
+                    }
+                )
+
+            return Response({
+                "message": "OTP sent to your phone number.",
+                "otp_code": otp
+            }, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VerifyPasswordResetOtpView(GenericAPIView):
@@ -183,26 +160,33 @@ class VerifyPasswordResetOtpView(GenericAPIView):
             phone = serializer.validated_data['phone_number']
             code = serializer.validated_data['code']
 
+            otp_record = OtpVerification.objects.filter(phone_number=phone, code=code, is_used=False).first()
+
+            if not otp_record or not otp_record.is_valid():
+                return Response({"error": "Invalid or expired OTP code."}, status=status.HTTP_400_BAD_REQUEST)
+
+            otp_record.is_used = True
+            otp_record.save()
+
             try:
                 user = User.objects.get(phone_number=phone)
-                password_reset = UserPasswordReset.objects.filter(user=user, code=code, verified=False).first()
-
-                if password_reset and  password_reset.is_token_valid and password_reset.otp_count < 3:
-                    password_reset.verified = True
-                    password_reset.save()
-                    
-                    return Response({
-                        "message": "OTP verified successfully. You can now reset your password.",
-                        "reset_token": password_reset.reset_token
-                    }, status=status.HTTP_200_OK)
-                else:
-                    return Response({"error": "Invalid or expired OTP code."}, status=400)
-
             except User.DoesNotExist:
-                return Response({"error": "User with this phone number not found."}, status=404)
+                return Response({"error": "User with this phone number not found."}, status=status.HTTP_404_NOT_FOUND)
+
+            # Create (or replace) a fresh reset token
+            password_reset, _ = UserPasswordReset.objects.update_or_create(
+                user=user,
+                defaults={"reset_token": uuid.uuid4()}
+            )
+
+            return Response({
+                "message": "OTP verified. You can now reset your password.",
+                "reset_token": str(password_reset.reset_token)
+            }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class PasswordResetConfirmView(GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = PasswordResetConfirmSerializer
@@ -213,29 +197,20 @@ class PasswordResetConfirmView(GenericAPIView):
             reset_token = serializer.validated_data['reset_token']
             new_password = serializer.validated_data['new_password']
 
-            try:
-                password_reset = UserPasswordReset.objects.filter(reset_token=reset_token, verified=True).first()
-                print("Password Reset Object:", password_reset)  # Debugging line
+            password_reset = UserPasswordReset.objects.filter(reset_token=reset_token).first()
 
-                if password_reset and password_reset.is_token_valid:
-                    user = password_reset.user
-                    user.set_password(new_password)
-                    user.is_active = True 
-                    user.is_verified = True
-                    user.save()
+            if not password_reset or not password_reset.is_valid:
+                return Response({"error": "Invalid or expired reset token."}, status=status.HTTP_400_BAD_REQUEST)
 
-                    password_reset.delete()  # Invalidate the reset token after successful password reset
-                    
-                    return Response({
-                        "message": "Password has been reset successfully. You can now log in."
-                    }, status=status.HTTP_200_OK)
-                else:
-                    return Response({"error": "Invalid or expired reset token."}, status=400)
+            user = password_reset.user
+            user.set_password(new_password)
+            user.save()
 
-            except User.DoesNotExist:
-                return Response({"error": "User not found."}, status=404)
+            password_reset.delete()
 
-        return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Password reset successfully. You can now log in."}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetailView(GenericAPIView):
