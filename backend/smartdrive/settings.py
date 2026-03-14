@@ -13,8 +13,8 @@ from firebase_admin import credentials
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Path to your downloaded JSON file
-cred = credentials.Certificate(f"{BASE_DIR}/firebase/firebase_credentials.json")
-firebase_admin.initialize_app(cred)
+# cred = credentials.Certificate(f"{BASE_DIR}/firebase/firebase_credentials.json")
+# firebase_admin.initialize_app(cred)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-g%!koy3&&c(7@6!n!p$s7i3w_wphg=!lg2twe^ts&a!rhk@#)x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

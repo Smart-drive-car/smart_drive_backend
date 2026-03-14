@@ -25,5 +25,6 @@ urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger'),
     path('api/auth/', include('apps.users.urls')),
+    path('api/vehicles/', include('apps.vehicles.urls')),
     # path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

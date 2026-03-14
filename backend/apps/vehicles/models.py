@@ -4,9 +4,15 @@ from apps.shared.models import BaseModel
 from apps.users.models import DriverProfile, User
 
 
+class VehicleBrand(BaseModel):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
 class VehicleModel(BaseModel):
     """Example: Chevrolet, Gentra, Nexia 3"""
-    brand = models.CharField(max_length=100)
+    brand = models.ForeignKey(VehicleBrand, on_delete=models.CASCADE)
     model_name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -15,7 +21,7 @@ class VehicleModel(BaseModel):
 class Car(BaseModel):
     vehicle_model = models.ForeignKey(VehicleModel, on_delete=models.SET_NULL, null=True)
     car_plate_number = models.CharField(max_length=20, unique=True)
-    year = models.PositiveIntegerField(null=True, blank=True)
+    # year = models.PositiveIntegerField(null=True, blank=True)
     current_mileage = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):

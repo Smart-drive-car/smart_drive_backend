@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Car, DriverCar, VehicleModel
+from .models import Car, DriverCar, VehicleBrand, VehicleModel, VehicleModel
 
 @admin.register(DriverCar)
 class DriverCarAdmin(admin.ModelAdmin):
@@ -10,7 +10,7 @@ class DriverCarAdmin(admin.ModelAdmin):
 
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
-    list_display = ('car_plate_number', 'vehicle_model', 'year', 'current_mileage')
+    list_display = ('car_plate_number', 'vehicle_model', 'current_mileage')
     search_fields = ('car_plate_number', 'vehicle_model__brand', 'vehicle_model__model_name')
 
 
@@ -18,3 +18,9 @@ class CarAdmin(admin.ModelAdmin):
 class VehicleModelAdmin(admin.ModelAdmin):
     list_display = ('brand', 'model_name')
     search_fields = ('brand', 'model_name')
+
+
+@admin.register(VehicleBrand)
+class VehicleBrandAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
