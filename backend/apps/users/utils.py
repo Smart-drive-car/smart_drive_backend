@@ -1,4 +1,5 @@
 import os
+import re
 
 import requests
 import random
@@ -56,6 +57,10 @@ DEVSMS_TOKEN = os.getenv('DEVSMS_TOKEN')
 
 def send_sms(phone_number):
 
+    clean_phone = re.sub(r'\D', '', phone_number) # Remove all non-digits
+    if len(clean_phone) >= 9: # Ensure it has at least 9 digits
+        phone_number = clean_phone[-9:]
+
     otp = random.randint(100000, 999999)    
 
     url = "https://devsms.uz/api/send_sms.php"
@@ -65,7 +70,7 @@ def send_sms(phone_number):
     }
     data = {
         "phone": "998" + phone_number,
-        "message": "Assalomu alaykum, tizimimizga xush kelibsiz!1",
+        "message": f"Smart Drive ilovasi - amaliyotni tasdiqlash kodi: {otp}",
         # "message": f"SmartDrive tasdiqlash kodi: {otp}",
     }
     response = requests.post(url, headers=headers, json=data)
