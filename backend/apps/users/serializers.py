@@ -265,3 +265,49 @@ class TestRegisterSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=6)
 
 
+
+class DriverProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DriverProfile
+        fields = ['full_name', 'image']
+
+class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
+    workshop_images = serializers.ListField(
+        child=serializers.ImageField(allow_empty_file=True, required=False, allow_null=True),
+        required=False,
+        allow_empty=True,
+        allow_null=True,
+        write_only=True
+    )
+
+    class Meta:
+        model = WorkshopProfile
+        fields = ['title', 'address', 'workshop_images']
+
+    def to_internal_value(self, data):
+        data = data.copy() if hasattr(data, 'copy') else data
+        if 'workshop_images' in data:
+            from django.core.files.uploadedfile import UploadedFile
+            images = data.getlist('workshop_images') if hasattr(data, 'getlist') else data.get('workshop_images', [])
+            valid_images = [img for img in images if isinstance(img, UploadedFile)]
+            if hasattr(data, 'setlist'):
+                data.setlist('workshop_images', valid_images)
+            else:
+                data['workshop_images'] = valid_images
+        return super().to_internal_value(data)
+
+    def update(self, instance, validated_data):
+        with transaction.atomic():
+            workshop_images = validated_data.pop('workshop_images', None)
+            instance = super().update(instance, validated_data)
+
+            if workshop_images is not None:
+                # Clear all old images when updating
+                instance.images.all().delete()
+                for img in workshop_images:
+                    if img:
+                        WorkshopProfileImages.objects.create(
+                            workshop_profile=instance, 
+                            image=img
+                        )
+            return instance

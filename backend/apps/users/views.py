@@ -1,21 +1,23 @@
 
 
+
+from .serializers import DriverProfileUpdateSerializer, WorkshopProfileUpdateSerializer
+from rest_framework.generics import UpdateAPIView
 import re
 import uuid
 
 from django.utils import timezone
 from django.shortcuts import render
 from rest_framework.views import APIView
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import CustomTokenObtainPairSerializer, ForgotPasswordSerializer, SendOtpSerializer, RegisterConfirmSerializer,UserDetailSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.core.cache import cache
 from .models import OtpVerification, User, Role, DriverProfile, UserPasswordReset, WorkshopProfile
-from .serializers import TestRegisterSerializer, RegistrationSerializer, PasswordResetConfirmSerializer
+from .serializers import TestRegisterSerializer, RegistrationSerializer, PasswordResetConfirmSerializer,CustomTokenObtainPairSerializer, ForgotPasswordSerializer, SendOtpSerializer, RegisterConfirmSerializer,UserDetailSerializer
 from .utils import send_eskiz_sms, send_sms
 from django.db import transaction
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -227,23 +229,20 @@ class UserDetailView(GenericAPIView):
         serializer = self.get_serializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-# class TestRegisterView(APIView):
-#     """
-#     Step 2: Check OTP and finally create User + Profile.
-#     """
 
-#     serializer_class = TestRegisterSerializer
-#     permission_classes = [AllowAny]
-#     def post(self, request):
-#         phone = request.data.get('phone_number')
-#         code = request.data.get('code')
-        
-#         sms_response = send_eskiz_sms(phone, f"This is test from Eskiz")
-#         print("Eskiz SMS Response:", sms_response)  # Debugging line
-        
-#         # 2. YOU MUST RETURN A RESPONSE HERE
-#         return Response({
-#             "status": "processed",
-#             "phone": phone,
-#             "eskiz_details": sms_response
-#         })
+
+class DriverProfileUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = DriverProfileUpdateSerializer
+
+    def get_object(self):
+        return self.request.user.driverprofile
+
+class WorkshopProfileUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = WorkshopProfileUpdateSerializer
+
+    def get_object(self):
+        return self.request.user.workshopprofile
