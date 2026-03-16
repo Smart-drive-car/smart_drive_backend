@@ -77,6 +77,12 @@ class SendOtpView(GenericAPIView):
         if serializer.is_valid():
             phone = serializer.validated_data['phone_number']
 
+            user = User.objects.filter(phone_number=phone).first()
+            if user:
+                is_login = True
+            else:
+                is_login = False
+
             otp = send_sms(phone)
 
             if otp:
@@ -90,7 +96,7 @@ class SendOtpView(GenericAPIView):
                     }
                 )
 
-            return Response({"message": "OTP sent successfully.", "otp_code": otp}, status=status.HTTP_200_OK)
+            return Response({"message": "OTP sent successfully.", "otp_code": otp, "is_login": is_login}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
