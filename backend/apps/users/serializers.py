@@ -84,8 +84,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
     address = serializers.CharField(required=False, write_only=True)
     # List of images for Workshop
     workshop_images = serializers.ListField(
-        child=serializers.ImageField(),
+        child=serializers.ImageField(allow_empty_file=True, required=False, allow_null=True),
         required=False,
+        allow_empty=True,
         allow_null=True,
         write_only=True
     )
@@ -97,6 +98,22 @@ class RegistrationSerializer(serializers.ModelSerializer):
             'full_name', 'image', 'title', 'address', 'workshop_images'
         ]
 
+    def to_internal_value(self, data):
+        # Make a mutable copy of the data
+        data = data.copy() if hasattr(data, 'copy') else data
+        
+        # Clean up workshop_images (Postman often sends empty strings for file fields)
+        if 'workshop_images' in data:
+            from django.core.files.uploadedfile import UploadedFile
+            images = data.getlist('workshop_images') if hasattr(data, 'getlist') else data.get('workshop_images', [])
+            valid_images = [img for img in images if isinstance(img, UploadedFile)]
+            if hasattr(data, 'setlist'):
+                data.setlist('workshop_images', valid_images)
+            else:
+                data['workshop_images'] = valid_images
+                
+        return super().to_internal_value(data)
+
     def validate(self, attrs):
         if attrs['password'] != attrs['password_confirm']:
             raise serializers.ValidationError({"password": "Passwords do not match."})
@@ -105,8 +122,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         if role == Role.DRIVER:
             if not attrs.get('full_name'):
                 raise serializers.ValidationError({"full_name": "Required for Drivers."})
-            if not attrs.get('image'):
-                raise serializers.ValidationError({"image": "Profile image is required for Drivers."})
                 
         if role == Role.WORKSHOP:
             if not attrs.get('title') or not attrs.get('address'):
@@ -155,10 +170,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 )
                 # Create multiple image records
                 for img in workshop_images:
-                    WorkshopProfileImages.objects.create(
-                        workshop_profile=workshop, 
-                        image=img
-                    )
+                    if img:  # Only save valid image files
+                        WorkshopProfileImages.objects.create(
+                            workshop_profile=workshop, 
+                            image=img
+                        )
 
             return user
 
