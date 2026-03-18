@@ -37,3 +37,4 @@ class DriverCar(BaseModel):
     class Meta:
         unique_together = ('driver_profile', 'car')
 
+

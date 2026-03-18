@@ -38,6 +38,7 @@ apps = [
     'apps.users',
     'apps.shared',
     'apps.vehicles',
+    'apps.services',
 ]
 
 libs = [
@@ -147,7 +148,7 @@ DB_PORT = getenv('DB_PORT')
 ESKIZ_EMAIL = getenv('ESKIZ_EMAIL')
 ESKIZ_SECRET_KEY = getenv('ESKIZ_SECRET_KEY')
 
-
+   
 DATABASES = {
     'default': {
         'ENGINE': DB_ENGINE,
