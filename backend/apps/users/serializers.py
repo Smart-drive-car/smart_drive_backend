@@ -330,10 +330,17 @@ class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
     old_password = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
     new_password = serializers.CharField(write_only=True, required=False, min_length=8, style={'input_type': 'password'})
     new_password_confirm = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
+    images = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = WorkshopProfile
-        fields = ['title', 'address', 'latitude', 'longitude', 'workshop_images', 'old_password', 'new_password', 'new_password_confirm']
+        fields = ['title', 'address', 'latitude', 'longitude', 'images', 'workshop_images', 'old_password', 'new_password', 'new_password_confirm']
+
+    def get_images(self, obj):
+        try:
+            return [{'id': img.id, 'image': img.image.url} for img in obj.images.all()]
+        except Exception:
+            return []
 
     def validate(self, attrs):
         # Check if password fields are being updated
