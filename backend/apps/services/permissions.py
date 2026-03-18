@@ -1,11 +1,25 @@
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
-class IsAdmin(BasePermission):
+class IsWorkshopOrReadOnly(BasePermission):
+    """
+    DRIVER → faqat GET
+    WORKSHOP → CRUD
+    ADMIN → CRUD
+    """
+
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.user.role == 'ADMIN'
+        user = request.user
+
+        if user.role == 'DRIVER':
+            return request.method in SAFE_METHODS
+
+        if user.role in ['WORKSHOP', 'ADMIN']:
+            return True
+
+        return False
 
 
-class IsWorkshop(BasePermission):
+class IsAdminOnly(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.user.role == 'WORKSHOP'
+        return request.user.role == 'ADMIN'

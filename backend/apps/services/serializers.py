@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import ServiceType, Service
+from apps.vehicles.models import DriverCar
 
 
 class ServiceTypeSerializer(serializers.ModelSerializer):
@@ -7,33 +8,24 @@ class ServiceTypeSerializer(serializers.ModelSerializer):
         model = ServiceType
         fields = '__all__'
 
-    def validate(self, attrs):
-        user = self.context['request'].user
-
-        if user.role != 'ADMIN':
-            raise serializers.ValidationError("Only ADMIN can create ServiceType")
-
-        return attrs
-
 
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
         fields = '__all__'
-        read_only_fields = ['workshop'] 
+        read_only_fields = ['workshop']
 
     def validate(self, attrs):
-        user = self.context['request'].user
+        request = self.context['request']
+        user = request.user
+        car = attrs.get('car')
 
-        if user.role != 'WORKSHOP':
-            raise serializers.ValidationError("Only WORKSHOP can create Service")
+        # 🚗 Driver faqat o'z mashinasini ishlata oladi
+        if user.role == 'DRIVER':
+            if not DriverCar.objects.filter(
+                driver_profile=user.driverprofile,
+                car=car
+            ).exists():
+                raise serializers.ValidationError("You can use only your own car")
 
         return attrs
-
-    def create(self, validated_data):
-        user = self.context['request'].user
-
-        # workshopni avtomatik qo‘shamiz
-        validated_data['workshop'] = user.workshopprofile
-
-        return super().create(validated_data)
