@@ -10,13 +10,13 @@ class DriverCarAdmin(admin.ModelAdmin):
 
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
-    list_display = ('car_plate_number', 'vehicle_model', 'current_mileage')
+    list_display = ('id', 'car_plate_number', 'vehicle_model', 'current_mileage')
     search_fields = ('car_plate_number', 'vehicle_model__brand', 'vehicle_model__model_name')
 
 
 @admin.register(VehicleModel)
 class VehicleModelAdmin(admin.ModelAdmin):
-    list_display = ('brand', 'model_name')
+    list_display = ('brand', 'model_name', 'image')
     search_fields = ('brand', 'model_name')
 
 

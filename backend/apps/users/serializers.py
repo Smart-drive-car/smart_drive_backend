@@ -23,10 +23,13 @@ class DriverProfileLoginSerializer(serializers.ModelSerializer):
     def get_cars(self, obj):
         # Fetches cars through the DriverCar relationship
         # Only returning basic info to keep the login response fast
-        car_links = DriverCar.objects.filter(driver_profile=obj).select_related('car', 'car__vehicle_model')
+        car_links = DriverCar.objects.filter(driver_profile=obj).select_related('car', 'car__vehicle_model', 'car__vehicle_model__brand')
+        from apps.vehicles.serializers import VehicleModelSerializer
         return [{
+            "id": link.car.id,
             "plate": link.car.car_plate_number,
-            "model": str(link.car.vehicle_model),
+            "model_id": link.car.vehicle_model.id if link.car.vehicle_model else None,
+            "vehicle_model": VehicleModelSerializer(link.car.vehicle_model).data if link.car.vehicle_model else None,
             "mileage": link.car.current_mileage
         } for link in car_links]
 
@@ -35,7 +38,7 @@ class WorkshopProfileLoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkshopProfile
-        fields = ['title', 'address', 'images']
+        fields = ['title', 'address', 'latitude', 'longitude', 'images']
 
     def get_images(self, obj):
         # returns a list of image URLs
@@ -82,6 +85,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
     
     title = serializers.CharField(required=False, write_only=True)
     address = serializers.CharField(required=False, write_only=True)
+    latitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, write_only=True, allow_null=True)
+    longitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, write_only=True, allow_null=True)
     # List of images for Workshop
     workshop_images = serializers.ListField(
         child=serializers.ImageField(allow_empty_file=True, required=False, allow_null=True),
@@ -94,8 +99,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'phone_number', 'password', 'password_confirm', 'role', 
-            'full_name', 'image', 'title', 'address', 'workshop_images'
+            'phone_number', 'password', 'password_confirm', 'role',
+            'full_name', 'image', 'title', 'address', 'latitude', 'longitude', 'workshop_images'
         ]
 
     def to_internal_value(self, data):
@@ -136,14 +141,16 @@ class RegistrationSerializer(serializers.ModelSerializer):
             role = validated_data.pop('role')
             password = validated_data.pop('password')
             phone = validated_data.pop('phone_number')
-            
+
             # Driver data
             full_name = validated_data.pop('full_name', None)
             driver_image = validated_data.pop('image', None)
-            
+
             # Workshop data
             title = validated_data.pop('title', None)
             address = validated_data.pop('address', None)
+            latitude = validated_data.pop('latitude', None)
+            longitude = validated_data.pop('longitude', None)
             workshop_images = validated_data.pop('workshop_images', [])
 
             # 1. Create User
@@ -157,22 +164,24 @@ class RegistrationSerializer(serializers.ModelSerializer):
             # 2. Create specific Profile and handle images
             if role == Role.DRIVER:
                 DriverProfile.objects.create(
-                    user=user, 
-                    full_name=full_name, 
+                    user=user,
+                    full_name=full_name,
                     image=driver_image
                 )
-                
+
             elif role == Role.WORKSHOP:
                 workshop = WorkshopProfile.objects.create(
-                    user=user, 
-                    title=title, 
-                    address=address
+                    user=user,
+                    title=title,
+                    address=address,
+                    latitude=latitude,
+                    longitude=longitude
                 )
                 # Create multiple image records
                 for img in workshop_images:
                     if img:  # Only save valid image files
                         WorkshopProfileImages.objects.create(
-                            workshop_profile=workshop, 
+                            workshop_profile=workshop,
                             image=img
                         )
 
@@ -267,9 +276,48 @@ class TestRegisterSerializer(serializers.Serializer):
 
 
 class DriverProfileUpdateSerializer(serializers.ModelSerializer):
+    old_password = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
+    new_password = serializers.CharField(write_only=True, required=False, min_length=8, style={'input_type': 'password'})
+    new_password_confirm = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
+
     class Meta:
         model = DriverProfile
-        fields = ['full_name', 'image']
+        fields = ['full_name', 'image', 'old_password', 'new_password', 'new_password_confirm']
+
+    def validate(self, attrs):
+        # Check if password fields are being updated
+        old_password = attrs.get('old_password')
+        new_password = attrs.get('new_password')
+        new_password_confirm = attrs.get('new_password_confirm')
+
+        # If any password field is provided, all must be provided and match
+        if old_password or new_password or new_password_confirm:
+            if not all([old_password, new_password, new_password_confirm]):
+                raise serializers.ValidationError(
+                    "To change password, provide old_password, new_password, and new_password_confirm."
+                )
+            if new_password != new_password_confirm:
+                raise serializers.ValidationError({"new_password": "Passwords do not match."})
+
+        return attrs
+
+    def update(self, instance, validated_data):
+        old_password = validated_data.pop('old_password', None)
+        new_password = validated_data.pop('new_password', None)
+        validated_data.pop('new_password_confirm', None)
+
+        # Update profile fields
+        instance = super().update(instance, validated_data)
+
+        # Handle password change if requested
+        if old_password and new_password:
+            user = instance.user
+            if not user.check_password(old_password):
+                raise serializers.ValidationError({"old_password": "Old password is incorrect."})
+            user.set_password(new_password)
+            user.save()
+
+        return instance
 
 class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
     workshop_images = serializers.ListField(
@@ -279,10 +327,30 @@ class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
         allow_null=True,
         write_only=True
     )
+    old_password = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
+    new_password = serializers.CharField(write_only=True, required=False, min_length=8, style={'input_type': 'password'})
+    new_password_confirm = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
 
     class Meta:
         model = WorkshopProfile
-        fields = ['title', 'address', 'workshop_images']
+        fields = ['title', 'address', 'latitude', 'longitude', 'workshop_images', 'old_password', 'new_password', 'new_password_confirm']
+
+    def validate(self, attrs):
+        # Check if password fields are being updated
+        old_password = attrs.get('old_password')
+        new_password = attrs.get('new_password')
+        new_password_confirm = attrs.get('new_password_confirm')
+
+        # If any password field is provided, all must be provided and match
+        if old_password or new_password or new_password_confirm:
+            if not all([old_password, new_password, new_password_confirm]):
+                raise serializers.ValidationError(
+                    "To change password, provide old_password, new_password, and new_password_confirm."
+                )
+            if new_password != new_password_confirm:
+                raise serializers.ValidationError({"new_password": "Passwords do not match."})
+
+        return attrs
 
     def to_internal_value(self, data):
         data = data.copy() if hasattr(data, 'copy') else data
@@ -297,17 +365,33 @@ class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
         return super().to_internal_value(data)
 
     def update(self, instance, validated_data):
+        old_password = validated_data.pop('old_password', None)
+        new_password = validated_data.pop('new_password', None)
+        validated_data.pop('new_password_confirm', None)
+        workshop_images = validated_data.pop('workshop_images', None)
+
         with transaction.atomic():
-            workshop_images = validated_data.pop('workshop_images', None)
+            # Update profile fields
             instance = super().update(instance, validated_data)
 
+            # Handle password change if requested
+            if old_password and new_password:
+                user = instance.user
+                if not user.check_password(old_password):
+                    raise serializers.ValidationError({"old_password": "Old password is incorrect."})
+                user.set_password(new_password)
+                user.save()
+
+            # Handle image updates
             if workshop_images is not None:
                 # Clear all old images when updating
                 instance.images.all().delete()
                 for img in workshop_images:
                     if img:
                         WorkshopProfileImages.objects.create(
-                            workshop_profile=instance, 
+                            workshop_profile=instance,
                             image=img
                         )
             return instance
+
+

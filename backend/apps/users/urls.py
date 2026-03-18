@@ -3,11 +3,11 @@ from .views import (ForgotPasswordView, LoginView, PasswordResetConfirmView, Reg
 
 urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
-    path('register/', RegisterView.as_view(), name='register'), 
+    path('register/', RegisterView.as_view(), name='register'),
     path('send-otp/', SendOtpView.as_view(), name='send_otp'),
     path('verify-otp/', VerifyOtpView.as_view(), name='verify_otp'),
     path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
-    path('verify-forgot-password/', VerifyPasswordResetOtpView.as_view(), name='verify_forgot_password'),  # Reusing SendOtpView for password reset
+    path('verify-forgot-password/', VerifyPasswordResetOtpView.as_view(), name='verify_forgot_password'),
     path('password-reset/', PasswordResetConfirmView.as_view(), name='password_reset'),
     path('profile/', UserDetailView.as_view(), name='profile'),
     path('profile/driver/update/', DriverProfileUpdateView.as_view(), name='driver_profile_update'),
