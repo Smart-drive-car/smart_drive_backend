@@ -46,6 +46,7 @@ libs = [
     'rest_framework_simplejwt',
     'drf_spectacular',
     'corsheaders',
+    'import_export',
 ]
 
 default_libs = [
