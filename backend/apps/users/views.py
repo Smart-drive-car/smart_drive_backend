@@ -3,13 +3,14 @@
 
 from .serializers import DriverProfileUpdateSerializer, WorkshopProfileUpdateSerializer
 from rest_framework.generics import UpdateAPIView
+from .permissions import IsDriver, IsWorkshop, IsOwnDriverProfile, IsOwnWorkshopProfile
 import re
 import uuid
 
 from django.utils import timezone
 from django.shortcuts import render
 from rest_framework.views import APIView
-from rest_framework.generics import GenericAPIView, CreateAPIView, UpdateAPIView
+from rest_framework.generics import GenericAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,7 +18,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.core.cache import cache
 from .models import OtpVerification, User, Role, DriverProfile, UserPasswordReset, WorkshopProfile
-from .serializers import TestRegisterSerializer, RegistrationSerializer, PasswordResetConfirmSerializer,CustomTokenObtainPairSerializer, ForgotPasswordSerializer, SendOtpSerializer, RegisterConfirmSerializer,UserDetailSerializer
+from .serializers import TestRegisterSerializer, RegistrationSerializer, PasswordResetConfirmSerializer, CustomTokenObtainPairSerializer, ForgotPasswordSerializer, SendOtpSerializer, RegisterConfirmSerializer,UserDetailSerializer
 from .utils import send_eskiz_sms, send_sms
 from django.db import transaction
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -223,6 +224,7 @@ class PasswordResetConfirmView(GenericAPIView):
 
 class UserDetailView(GenericAPIView):
     serializer_class = UserDetailSerializer
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
@@ -232,17 +234,37 @@ class UserDetailView(GenericAPIView):
 
 
 class DriverProfileUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsDriver, IsOwnDriverProfile]
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = DriverProfileUpdateSerializer
 
     def get_object(self):
         return self.request.user.driverprofile
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+            return Response({"message": "Driver profile updated successfully.", "data": serializer.data}, status=status.HTTP_200_OK)
+        return Response({"error": "Failed to update profile", "details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
 class WorkshopProfileUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsWorkshop, IsOwnWorkshopProfile]
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = WorkshopProfileUpdateSerializer
 
     def get_object(self):
         return self.request.user.workshopprofile
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+            return Response({"message": "Workshop profile updated successfully.", "data": serializer.data}, status=status.HTTP_200_OK)
+        return Response({"error": "Failed to update profile", "details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+

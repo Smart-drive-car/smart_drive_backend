@@ -47,6 +47,7 @@ libs = [
     'rest_framework_simplejwt',
     'drf_spectacular',
     'corsheaders',
+    'import_export',
 ]
 
 default_libs = [
@@ -174,4 +175,11 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     'TITLE': 'SmartDrive API',
     'VERSION': '1.0.0',
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }
