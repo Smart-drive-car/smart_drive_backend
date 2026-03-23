@@ -39,7 +39,7 @@ class WorkshopProfileLoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkshopProfile
-        fields = ['title', 'address', 'working_time', 'latitude', 'longitude', 'images']
+        fields = ['title', 'address', 'description', 'working_time', 'latitude', 'longitude', 'images']
 
     def get_images(self, obj):
         # returns a list of image URLs
@@ -93,6 +93,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     
     title = serializers.CharField(required=False, write_only=True)
     address = serializers.CharField(required=False, write_only=True)
+    description = serializers.CharField(required=False, write_only=True, allow_blank=True, allow_null=True)
     working_time = serializers.CharField(required=False, write_only=True, allow_blank=True, allow_null=True)
     latitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, write_only=True, allow_null=True)
     longitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, write_only=True, allow_null=True)
@@ -109,7 +110,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'phone_number', 'password', 'password_confirm', 'role',
-            'full_name', 'image', 'title', 'address', 'working_time', 'latitude', 'longitude', 'workshop_images'
+            'full_name', 'image', 'title', 'address', 'description', 'working_time', 'latitude', 'longitude', 'workshop_images'
         ]
 
     def to_internal_value(self, data):
@@ -158,6 +159,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             # Workshop data
             title = validated_data.pop('title', None)
             address = validated_data.pop('address', None)
+            description = validated_data.pop('description', None)
             working_time = validated_data.pop('working_time', None)
             latitude = validated_data.pop('latitude', None)
             longitude = validated_data.pop('longitude', None)
@@ -180,14 +182,20 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 )
 
             elif role == Role.WORKSHOP:
-                workshop = WorkshopProfile.objects.create(
-                    user=user,
-                    title=title,
-                    address=address,
-                    working_time=working_time,
-                    latitude=latitude,
-                    longitude=longitude
-                )
+                try:
+                    workshop = WorkshopProfile.objects.create(
+                        user=user,
+                        title=title,
+                        address=address,
+                        description=description,
+                        working_time=working_time,
+                        latitude=latitude,
+                        longitude=longitude
+                    )
+                except (ProgrammingError, OperationalError):
+                    raise serializers.ValidationError({
+                        "error": "Database schema is out of date. Please run migrations."
+                    })
                 # Create multiple image records
                 for img in workshop_images:
                     if img:  # Only save valid image files
@@ -360,7 +368,7 @@ class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkshopProfile
-        fields = ['title', 'address', 'working_time', 'latitude', 'longitude', 'images', 'workshop_images', 'deleted_image_ids', 'old_password', 'new_password', 'new_password_confirm']
+        fields = ['title', 'address', 'description', 'working_time', 'latitude', 'longitude', 'images', 'workshop_images', 'deleted_image_ids', 'old_password', 'new_password', 'new_password_confirm']
 
     def get_images(self, obj):
         try:
@@ -411,7 +419,12 @@ class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
 
         with transaction.atomic():
             # Update profile fields
-            instance = super().update(instance, validated_data)
+            try:
+                instance = super().update(instance, validated_data)
+            except (ProgrammingError, OperationalError):
+                raise serializers.ValidationError({
+                    "error": "Database schema is out of date. Please run migrations."
+                })
 
             # Handle password change if requested
             if new_password:
