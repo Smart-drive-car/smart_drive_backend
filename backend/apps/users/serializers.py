@@ -12,6 +12,27 @@ from drf_spectacular.utils import extend_schema_field
 from firebase_admin import auth
 
 
+WORKING_TIME_PATTERN = re.compile(r'^\s*([01]\d|2[0-3]):([0-5]\d)\s*-\s*([01]\d|2[0-3]):([0-5]\d)\s*$')
+
+
+def validate_working_time_format(value):
+    if value in (None, ''):
+        return value
+
+    match = WORKING_TIME_PATTERN.match(value)
+    if not match:
+        raise serializers.ValidationError("working_time must be in HH:MM-HH:MM format.")
+
+    start_hour, start_minute, end_hour, end_minute = map(int, match.groups())
+    start_total = (start_hour * 60) + start_minute
+    end_total = (end_hour * 60) + end_minute
+
+    if start_total == end_total:
+        raise serializers.ValidationError("working_time start and end time cannot be the same.")
+
+    return f"{start_hour:02d}:{start_minute:02d}-{end_hour:02d}:{end_minute:02d}"
+
+
 # --- Small Serializers for Profile Data ---
 
 class DriverProfileLoginSerializer(serializers.ModelSerializer):
@@ -42,8 +63,11 @@ class WorkshopProfileLoginSerializer(serializers.ModelSerializer):
         fields = ['title', 'address', 'description', 'working_time', 'latitude', 'longitude', 'images']
 
     def get_images(self, obj):
-        # returns a list of image URLs
-        return [img.image.url for img in obj.images.all()]
+        # returns image IDs with URLs for easier frontend operations
+        try:
+            return [{'id': img.id, 'image': img.image.url} for img in obj.images.all()]
+        except Exception:
+            return []
 
 class AdminProfileLoginSerializer(serializers.ModelSerializer):
     class Meta:
@@ -143,6 +167,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Workshop needs title and address.")
             
         return attrs
+
+    def validate_working_time(self, value):
+        return validate_working_time_format(value)
 
     def create(self, validated_data):
         with transaction.atomic():
@@ -348,6 +375,7 @@ class DriverProfileUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
+    working_time = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     workshop_images = serializers.ListField(
         child=serializers.ImageField(allow_empty_file=True, required=False, allow_null=True),
         required=False,
@@ -397,6 +425,9 @@ class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"old_password": "Old password is incorrect."})
 
         return attrs
+
+    def validate_working_time(self, value):
+        return validate_working_time_format(value)
 
     def to_internal_value(self, data):
         data = data.copy() if hasattr(data, 'copy') else data
