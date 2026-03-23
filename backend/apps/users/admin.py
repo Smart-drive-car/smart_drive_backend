@@ -73,7 +73,7 @@ class DriverProfileAdmin(admin.ModelAdmin):
 
 @admin.register(WorkshopProfile)
 class WorkshopProfileAdmin(admin.ModelAdmin):
-    list_display = ('title', 'user', 'created_at')
+    list_display = ('title', 'working_time', 'user', 'created_at')
     search_fields = ('title', 'user__phone_number')
 
 @admin.register(AdminProfile)

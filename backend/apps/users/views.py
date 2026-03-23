@@ -217,7 +217,16 @@ class PasswordResetConfirmView(GenericAPIView):
 
             password_reset.delete()
 
-            return Response({"message": "Password reset successfully. You can now log in."}, status=status.HTTP_200_OK)
+            refresh = RefreshToken.for_user(user)
+
+            return Response({
+                "message": "Password reset successfully.",
+                "tokens": {
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                },
+                "user": UserDetailSerializer(user).data,
+            }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -242,7 +251,8 @@ class DriverProfileUpdateView(UpdateAPIView):
         return self.request.user.driverprofile
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        kwargs['partial'] = True
+        partial = kwargs.get('partial', True)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
@@ -259,7 +269,8 @@ class WorkshopProfileUpdateView(UpdateAPIView):
         return self.request.user.workshopprofile
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        kwargs['partial'] = True
+        partial = kwargs.get('partial', True)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():

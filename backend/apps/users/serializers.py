@@ -4,6 +4,7 @@ from .models import DriverProfile, WorkshopProfile, AdminProfile, WorkshopProfil
 from apps.vehicles.models import DriverCar, Car
 from .models import User, Role
 from django.db import transaction
+from django.db.utils import ProgrammingError, OperationalError
 import re
 import firebase_admin
 from firebase_admin import auth as firebase_auth
@@ -38,7 +39,7 @@ class WorkshopProfileLoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkshopProfile
-        fields = ['title', 'address', 'latitude', 'longitude', 'images']
+        fields = ['title', 'address', 'working_time', 'latitude', 'longitude', 'images']
 
     def get_images(self, obj):
         # returns a list of image URLs
@@ -56,11 +57,18 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = User
         fields = ['phone_number', 'role', 'profile']
 
+    def _safe_workshop_profile(self, obj):
+        try:
+            profile = getattr(obj, 'workshopprofile', None)
+            return WorkshopProfileLoginSerializer(profile).data if profile else None
+        except (ProgrammingError, OperationalError):
+            return None
+
     def get_profile(self, obj):
         if obj.role == Role.DRIVER:
             return DriverProfileLoginSerializer(getattr(obj, 'driverprofile', None)).data
         elif obj.role == Role.WORKSHOP:
-            return WorkshopProfileLoginSerializer(getattr(obj, 'workshopprofile', None)).data
+            return self._safe_workshop_profile(obj)
         elif obj.role == Role.ADMIN:
             return AdminProfileLoginSerializer(getattr(obj, 'admin_profile', None)).data
         return None
@@ -85,6 +93,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     
     title = serializers.CharField(required=False, write_only=True)
     address = serializers.CharField(required=False, write_only=True)
+    working_time = serializers.CharField(required=False, write_only=True, allow_blank=True, allow_null=True)
     latitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, write_only=True, allow_null=True)
     longitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, write_only=True, allow_null=True)
     # List of images for Workshop
@@ -100,7 +109,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'phone_number', 'password', 'password_confirm', 'role',
-            'full_name', 'image', 'title', 'address', 'latitude', 'longitude', 'workshop_images'
+            'full_name', 'image', 'title', 'address', 'working_time', 'latitude', 'longitude', 'workshop_images'
         ]
 
     def to_internal_value(self, data):
@@ -149,6 +158,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             # Workshop data
             title = validated_data.pop('title', None)
             address = validated_data.pop('address', None)
+            working_time = validated_data.pop('working_time', None)
             latitude = validated_data.pop('latitude', None)
             longitude = validated_data.pop('longitude', None)
             workshop_images = validated_data.pop('workshop_images', [])
@@ -174,6 +184,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
                     user=user,
                     title=title,
                     address=address,
+                    working_time=working_time,
                     latitude=latitude,
                     longitude=longitude
                 )
@@ -197,6 +208,13 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             return clean_phone[-9:] # Return the last 9 digits    
         raise serializers.ValidationError("Phone number must contain at least 9 digits.")
 
+    def _safe_workshop_profile(self, user):
+        try:
+            profile = getattr(user, 'workshopprofile', None)
+            return WorkshopProfileLoginSerializer(profile).data if profile else None
+        except (ProgrammingError, OperationalError):
+            return None
+
     def validate(self, attrs):
         # 1. Get standard JWT data (access & refresh tokens)
         data = super().validate(attrs)
@@ -215,8 +233,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             data['user']['profile'] = DriverProfileLoginSerializer(profile).data if profile else None
         
         elif user.role == 'WORKSHOP':
-            profile = getattr(user, 'workshopprofile', None)
-            data['user']['profile'] = WorkshopProfileLoginSerializer(profile).data if profile else None
+            data['user']['profile'] = self._safe_workshop_profile(user)
             
         elif user.role == 'ADMIN':
             profile = getattr(user, 'admin_profile', None)
@@ -298,6 +315,11 @@ class DriverProfileUpdateSerializer(serializers.ModelSerializer):
                 )
             if new_password != new_password_confirm:
                 raise serializers.ValidationError({"new_password": "Passwords do not match."})
+                
+            # Valiate old password here during validation cycle
+            user = self.instance.user
+            if not user.check_password(old_password):
+                raise serializers.ValidationError({"old_password": "Old password is incorrect."})
 
         return attrs
 
@@ -310,10 +332,8 @@ class DriverProfileUpdateSerializer(serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
 
         # Handle password change if requested
-        if old_password and new_password:
+        if new_password:
             user = instance.user
-            if not user.check_password(old_password):
-                raise serializers.ValidationError({"old_password": "Old password is incorrect."})
             user.set_password(new_password)
             user.save()
 
@@ -327,6 +347,12 @@ class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
         allow_null=True,
         write_only=True
     )
+    deleted_image_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        write_only=True,
+        help_text="Provide a list of image IDs you wish to delete."
+    )
     old_password = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
     new_password = serializers.CharField(write_only=True, required=False, min_length=8, style={'input_type': 'password'})
     new_password_confirm = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
@@ -334,7 +360,7 @@ class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkshopProfile
-        fields = ['title', 'address', 'latitude', 'longitude', 'images', 'workshop_images', 'old_password', 'new_password', 'new_password_confirm']
+        fields = ['title', 'address', 'working_time', 'latitude', 'longitude', 'images', 'workshop_images', 'deleted_image_ids', 'old_password', 'new_password', 'new_password_confirm']
 
     def get_images(self, obj):
         try:
@@ -357,6 +383,11 @@ class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
             if new_password != new_password_confirm:
                 raise serializers.ValidationError({"new_password": "Passwords do not match."})
 
+            # Check old password inside validate instead of update
+            user = self.instance.user
+            if not user.check_password(old_password):
+                raise serializers.ValidationError({"old_password": "Old password is incorrect."})
+
         return attrs
 
     def to_internal_value(self, data):
@@ -376,23 +407,24 @@ class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
         new_password = validated_data.pop('new_password', None)
         validated_data.pop('new_password_confirm', None)
         workshop_images = validated_data.pop('workshop_images', None)
+        deleted_image_ids = validated_data.pop('deleted_image_ids', [])
 
         with transaction.atomic():
             # Update profile fields
             instance = super().update(instance, validated_data)
 
             # Handle password change if requested
-            if old_password and new_password:
+            if new_password:
                 user = instance.user
-                if not user.check_password(old_password):
-                    raise serializers.ValidationError({"old_password": "Old password is incorrect."})
                 user.set_password(new_password)
                 user.save()
 
-            # Handle image updates
-            if workshop_images is not None:
-                # Clear all old images when updating
-                instance.images.all().delete()
+            # Process image deletions
+            if deleted_image_ids:
+                instance.images.filter(id__in=deleted_image_ids).delete()
+
+            # Process new image additions (append instead of overwrite)
+            if workshop_images:
                 for img in workshop_images:
                     if img:
                         WorkshopProfileImages.objects.create(
