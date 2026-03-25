@@ -4,7 +4,7 @@ from django.db import transaction
 from django.db.utils import ProgrammingError, OperationalError
 from rest_framework import serializers
 
-from .models import WorkshopProfile, WorkshopProfileImages
+from .models import WorkshopProfile, WorkshopProfileImages, WorkshopRating
 
 
 WORKING_TIME_PATTERN = re.compile(r'^\s*([01]\d|2[0-3]):([0-5]\d)\s*-\s*([01]\d|2[0-3]):([0-5]\d)\s*$')
@@ -48,6 +48,25 @@ class WorkshopProfileListSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkshopProfile
         fields = ['id', 'title', 'address', 'description', 'working_time', 'latitude', 'longitude', 'images']
+
+    def get_images(self, obj):
+        try:
+            return [{'id': img.id, 'image': img.image.url} for img in obj.images.all()]
+        except Exception:
+            return []
+
+
+class WorkshopDetailSerializer(serializers.ModelSerializer):
+    images = serializers.SerializerMethodField()
+    total_customers = serializers.IntegerField(read_only=True)
+    rating = serializers.FloatField(source='average_rating', read_only=True)
+
+    class Meta:
+        model = WorkshopProfile
+        fields = [
+            'id', 'title', 'address', 'description', 'working_time',
+            'latitude', 'longitude', 'images', 'total_customers', 'rating'
+        ]
 
     def get_images(self, obj):
         try:
@@ -151,3 +170,14 @@ class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
                             image=img
                         )
             return instance
+
+
+class WorkshopRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkshopRating
+        fields = ['rating']
+
+    def validate_rating(self, value):
+        if value < 1 or value > 5:
+            raise serializers.ValidationError("Rating must be between 1 and 5.")
+        return value

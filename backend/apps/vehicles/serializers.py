@@ -23,11 +23,12 @@ class CarUpdateSerializer(serializers.ModelSerializer):
     )
     vehicle_model = VehicleModelSerializer(read_only=True)
     current_mileage = serializers.IntegerField(required=False, min_value=0)
+    released_year = serializers.IntegerField(required=False, min_value=1886)
     car_plate_number = serializers.CharField(max_length=20, required=False, allow_blank=False)
 
     class Meta:
         model = Car
-        fields = ['id', 'car_plate_number', 'current_mileage', 'vehicle_model_id', 'vehicle_model']
+        fields = ['id', 'car_plate_number', 'released_year', 'current_mileage', 'vehicle_model_id', 'vehicle_model']
 
     def validate_car_plate_number(self, value):
         if value:
@@ -47,11 +48,12 @@ class CarCreateSerializer(serializers.ModelSerializer):
     vehicle_model = VehicleModelSerializer(read_only=True)
 
     car_plate_number = serializers.CharField(max_length=20, required=True, allow_blank=False)
+    released_year = serializers.IntegerField(required=False, allow_null=True, min_value=1886)
     current_mileage = serializers.IntegerField(required=False, default=0, min_value=0)
 
     class Meta:
         model = Car
-        fields = ['id', 'car_plate_number', 'current_mileage', 'vehicle_model_id', 'vehicle_model']
+        fields = ['id', 'car_plate_number', 'released_year', 'current_mileage', 'vehicle_model_id', 'vehicle_model']
 
     def validate_car_plate_number(self, value):
         # Clean the plate: Remove spaces and make uppercase
@@ -72,6 +74,7 @@ class CarCreateSerializer(serializers.ModelSerializer):
             owner=driver_profile,
             car_plate_number=plate,
             vehicle_model=validated_data.get('vehicle_model'),
+            released_year=validated_data.get('released_year'),
             current_mileage=validated_data.get('current_mileage')
         )
 

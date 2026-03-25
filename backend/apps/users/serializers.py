@@ -8,8 +8,8 @@ from apps.workshop.serializers import WorkshopProfileLoginSerializer, validate_w
 from .models import User, Role
 from django.db import transaction
 from django.db.utils import ProgrammingError, OperationalError
-import re
 from drf_spectacular.utils import extend_schema_field
+from .phone_utils import normalize_phone_number
 
 
 # --- Small Serializers for Profile Data ---
@@ -51,6 +51,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
         # This is just for the schema generator
         pass
 
+
+    phone_number = serializers.CharField(max_length=20)
 
     # Password fields
     password = serializers.CharField(write_only=True, min_length=8, style={'input_type': 'password'})
@@ -115,6 +117,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     def validate_working_time(self, value):
         return validate_working_time_format(value)
+
+    def validate_phone_number(self, value):
+        try:
+            return normalize_phone_number(value)
+        except ValueError as exc:
+            raise serializers.ValidationError(str(exc))
 
     def create(self, validated_data):
         with transaction.atomic():
@@ -183,10 +191,10 @@ class RegistrationSerializer(serializers.ModelSerializer):
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def validate_phone_number(self, value):
-        clean_phone = re.sub(r'\D', '', value) # Remove all non-digits
-        if len(clean_phone) >= 9: # Ensure it has at least 9 digits
-            return clean_phone[-9:] # Return the last 9 digits    
-        raise serializers.ValidationError("Phone number must contain at least 9 digits.")
+        try:
+            return normalize_phone_number(value)
+        except ValueError as exc:
+            raise serializers.ValidationError(str(exc))
 
     def _safe_workshop_profile(self, user):
         try:
@@ -196,6 +204,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             return None
 
     def validate(self, attrs):
+        username_field = self.username_field
+        try:
+            attrs[username_field] = normalize_phone_number(attrs.get(username_field, ''))
+        except ValueError as exc:
+            raise serializers.ValidationError({username_field: str(exc)})
+
         # 1. Get standard JWT data (access & refresh tokens)
         data = super().validate(attrs)
         
@@ -233,38 +247,30 @@ class SendOtpSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)
 
     def validate_phone_number(self, value):
-        """
-        Cleans '+998901234567' or '998901234567' into your model's 9-digit format.
-        """
-        # Extract the last 9 digits to match your regex: r'^\d{9}$'
-        clean_phone = re.sub(r'\D', '', value) # Remove all non-digits
-        if len(clean_phone) >= 9:
-            return clean_phone[-9:]
-        raise serializers.ValidationError("Phone number must contain at least 9 digits.")
+        try:
+            return normalize_phone_number(value)
+        except ValueError as exc:
+            raise serializers.ValidationError(str(exc))
 
 class RegisterConfirmSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)
     code = serializers.CharField(max_length=6)   
 
     def validate_phone_number(self, value):
-        """
-        Cleans '+998901234567' or '998901234567' into your model's 9-digit format.
-        """
-        # Extract the last 9 digits to match your regex: r'^\d{9}$'
-        clean_phone = re.sub(r'\D', '', value) # Remove all non-digits
-        if len(clean_phone) >= 9:
-            return clean_phone[-9:]
-        raise serializers.ValidationError("Phone number must contain at least 9 digits.")
+        try:
+            return normalize_phone_number(value)
+        except ValueError as exc:
+            raise serializers.ValidationError(str(exc))
 
 
 class ForgotPasswordSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)
 
     def validate_phone_number(self, value):
-        clean_phone = re.sub(r'\D', '', value)
-        if len(clean_phone) >= 9:
-            return clean_phone[-9:]
-        raise serializers.ValidationError("Phone number must contain at least 9 digits.")
+        try:
+            return normalize_phone_number(value)
+        except ValueError as exc:
+            raise serializers.ValidationError(str(exc))
 
 class TestRegisterSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)

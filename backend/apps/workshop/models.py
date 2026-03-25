@@ -1,6 +1,8 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from apps.shared.models import BaseModel
+from apps.driver.models import DriverProfile
 from apps.users.models import User
 
 
@@ -29,3 +31,15 @@ class WorkshopProfileImages(BaseModel):
 
     class Meta:
         db_table = 'users_workshopprofileimages'
+
+
+class WorkshopRating(BaseModel):
+    workshop = models.ForeignKey(WorkshopProfile, on_delete=models.CASCADE, related_name='ratings')
+    driver = models.ForeignKey(DriverProfile, on_delete=models.CASCADE, related_name='workshop_ratings')
+    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+
+    def __str__(self):
+        return f"{self.workshop.title} - {self.driver.full_name}: {self.rating}"
+
+    class Meta:
+        unique_together = ('workshop', 'driver')

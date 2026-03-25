@@ -4,11 +4,14 @@ from django.core.validators import RegexValidator
 from apps.shared.models import BaseModel
 from django.utils import timezone
 import uuid
+from .phone_utils import normalize_phone_number
 
 class UserManager(BaseUserManager):
     def create_user(self, phone_number, password=None, **extra_fields):
         if not phone_number:
             raise ValueError('Users must have a phone number')
+
+        phone_number = normalize_phone_number(phone_number)
 
         user = self.model(
             phone_number=phone_number,

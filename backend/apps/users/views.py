@@ -13,6 +13,13 @@ from .serializers import RegistrationSerializer, PasswordResetConfirmSerializer,
 from .utils import send_sms
 from rest_framework_simplejwt.tokens import RefreshToken
 
+
+def get_user_by_normalized_phone(phone_number):
+    user = User.objects.filter(phone_number=phone_number).first()
+    if user:
+        return user
+    return User.objects.filter(phone_number__endswith=phone_number).first()
+
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
     permission_classes = [AllowAny]
@@ -122,7 +129,8 @@ class ForgotPasswordView(GenericAPIView):
         if serializer.is_valid():
             phone = serializer.validated_data['phone_number']
 
-            if not User.objects.filter(phone_number=phone).exists():
+            user = get_user_by_normalized_phone(phone)
+            if not user:
                 return Response({"error": "User with this phone number not found."}, status=status.HTTP_404_NOT_FOUND)
 
             otp = send_sms(phone)
@@ -163,9 +171,8 @@ class VerifyPasswordResetOtpView(GenericAPIView):
             otp_record.is_used = True
             otp_record.save()
 
-            try:
-                user = User.objects.get(phone_number=phone)
-            except User.DoesNotExist:
+            user = get_user_by_normalized_phone(phone)
+            if not user:
                 return Response({"error": "User with this phone number not found."}, status=status.HTTP_404_NOT_FOUND)
 
             # Create (or replace) a fresh reset token
