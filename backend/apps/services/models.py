@@ -20,3 +20,6 @@ class Service(BaseModel):
 
     def __str__(self):
         return f"{self.service_type.name} for {self.car} at {self.workshop.title}"
+    
+    class Meta:
+        ordering = ['-created_at']
