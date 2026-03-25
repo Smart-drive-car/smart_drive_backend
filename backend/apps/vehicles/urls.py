@@ -4,6 +4,7 @@ from .views import (
     VehicleRetrieveUpdateDestroyView,
     VehicleBrandListView,
     VehicleModelListView,
+    CarSearchView,
 )
 
 urlpatterns = [
@@ -11,4 +12,5 @@ urlpatterns = [
     path('models/', VehicleModelListView.as_view(), name='vehicle-model-list'),
     path('create/', VehicleCreateView.as_view(), name='vehicle-create'),
     path('<int:pk>/', VehicleRetrieveUpdateDestroyView.as_view(), name='vehicle-detail'),
+    path('search/', CarSearchView.as_view(), name='car-search'),
 ]
