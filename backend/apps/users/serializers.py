@@ -1,73 +1,18 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import DriverProfile, WorkshopProfile, AdminProfile, WorkshopProfileImages
-from apps.vehicles.models import DriverCar, Car
+from .models import AdminProfile
+from apps.driver.models import DriverProfile
+from apps.workshop.models import WorkshopProfile, WorkshopProfileImages
+from apps.driver.serializers import DriverProfileLoginSerializer
+from apps.workshop.serializers import WorkshopProfileLoginSerializer, validate_working_time_format
 from .models import User, Role
 from django.db import transaction
 from django.db.utils import ProgrammingError, OperationalError
 import re
-import firebase_admin
-from firebase_admin import auth as firebase_auth
 from drf_spectacular.utils import extend_schema_field
-from firebase_admin import auth
-
-
-WORKING_TIME_PATTERN = re.compile(r'^\s*([01]\d|2[0-3]):([0-5]\d)\s*-\s*([01]\d|2[0-3]):([0-5]\d)\s*$')
-
-
-def validate_working_time_format(value):
-    if value in (None, ''):
-        return value
-
-    match = WORKING_TIME_PATTERN.match(value)
-    if not match:
-        raise serializers.ValidationError("working_time must be in HH:MM-HH:MM format.")
-
-    start_hour, start_minute, end_hour, end_minute = map(int, match.groups())
-    start_total = (start_hour * 60) + start_minute
-    end_total = (end_hour * 60) + end_minute
-
-    if start_total == end_total:
-        raise serializers.ValidationError("working_time start and end time cannot be the same.")
-
-    return f"{start_hour:02d}:{start_minute:02d}-{end_hour:02d}:{end_minute:02d}"
 
 
 # --- Small Serializers for Profile Data ---
-
-class DriverProfileLoginSerializer(serializers.ModelSerializer):
-    cars = serializers.SerializerMethodField()
-
-    class Meta:
-        model = DriverProfile
-        fields = ['full_name', 'image', 'cars']
-
-    def get_cars(self, obj):
-        # Fetches cars through the DriverCar relationship
-        # Only returning basic info to keep the login response fast
-        car_links = DriverCar.objects.filter(driver_profile=obj).select_related('car', 'car__vehicle_model', 'car__vehicle_model__brand')
-        from apps.vehicles.serializers import VehicleModelSerializer
-        return [{
-            "id": link.car.id,
-            "plate": link.car.car_plate_number,
-            "model_id": link.car.vehicle_model.id if link.car.vehicle_model else None,
-            "vehicle_model": VehicleModelSerializer(link.car.vehicle_model).data if link.car.vehicle_model else None,
-            "mileage": link.car.current_mileage
-        } for link in car_links]
-
-class WorkshopProfileLoginSerializer(serializers.ModelSerializer):
-    images = serializers.SerializerMethodField()
-
-    class Meta:
-        model = WorkshopProfile
-        fields = ['title', 'address', 'description', 'working_time', 'latitude', 'longitude', 'images']
-
-    def get_images(self, obj):
-        # returns image IDs with URLs for easier frontend operations
-        try:
-            return [{'id': img.id, 'image': img.image.url} for img in obj.images.all()]
-        except Exception:
-            return []
 
 class AdminProfileLoginSerializer(serializers.ModelSerializer):
     class Meta:
@@ -326,155 +271,5 @@ class TestRegisterSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=6)
 
 
-
-class DriverProfileUpdateSerializer(serializers.ModelSerializer):
-    old_password = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
-    new_password = serializers.CharField(write_only=True, required=False, min_length=8, style={'input_type': 'password'})
-    new_password_confirm = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
-
-    class Meta:
-        model = DriverProfile
-        fields = ['full_name', 'image', 'old_password', 'new_password', 'new_password_confirm']
-
-    def validate(self, attrs):
-        # Check if password fields are being updated
-        old_password = attrs.get('old_password')
-        new_password = attrs.get('new_password')
-        new_password_confirm = attrs.get('new_password_confirm')
-
-        # If any password field is provided, all must be provided and match
-        if old_password or new_password or new_password_confirm:
-            if not all([old_password, new_password, new_password_confirm]):
-                raise serializers.ValidationError(
-                    "To change password, provide old_password, new_password, and new_password_confirm."
-                )
-            if new_password != new_password_confirm:
-                raise serializers.ValidationError({"new_password": "Passwords do not match."})
-                
-            # Valiate old password here during validation cycle
-            user = self.instance.user
-            if not user.check_password(old_password):
-                raise serializers.ValidationError({"old_password": "Old password is incorrect."})
-
-        return attrs
-
-    def update(self, instance, validated_data):
-        old_password = validated_data.pop('old_password', None)
-        new_password = validated_data.pop('new_password', None)
-        validated_data.pop('new_password_confirm', None)
-
-        # Update profile fields
-        instance = super().update(instance, validated_data)
-
-        # Handle password change if requested
-        if new_password:
-            user = instance.user
-            user.set_password(new_password)
-            user.save()
-
-        return instance
-
-class WorkshopProfileUpdateSerializer(serializers.ModelSerializer):
-    working_time = serializers.CharField(required=False, allow_blank=True, allow_null=True)
-    workshop_images = serializers.ListField(
-        child=serializers.ImageField(allow_empty_file=True, required=False, allow_null=True),
-        required=False,
-        allow_empty=True,
-        allow_null=True,
-        write_only=True
-    )
-    deleted_image_ids = serializers.ListField(
-        child=serializers.IntegerField(),
-        required=False,
-        write_only=True,
-        help_text="Provide a list of image IDs you wish to delete."
-    )
-    old_password = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
-    new_password = serializers.CharField(write_only=True, required=False, min_length=8, style={'input_type': 'password'})
-    new_password_confirm = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
-    images = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = WorkshopProfile
-        fields = ['title', 'address', 'description', 'working_time', 'latitude', 'longitude', 'images', 'workshop_images', 'deleted_image_ids', 'old_password', 'new_password', 'new_password_confirm']
-
-    def get_images(self, obj):
-        try:
-            return [{'id': img.id, 'image': img.image.url} for img in obj.images.all()]
-        except Exception:
-            return []
-
-    def validate(self, attrs):
-        # Check if password fields are being updated
-        old_password = attrs.get('old_password')
-        new_password = attrs.get('new_password')
-        new_password_confirm = attrs.get('new_password_confirm')
-
-        # If any password field is provided, all must be provided and match
-        if old_password or new_password or new_password_confirm:
-            if not all([old_password, new_password, new_password_confirm]):
-                raise serializers.ValidationError(
-                    "To change password, provide old_password, new_password, and new_password_confirm."
-                )
-            if new_password != new_password_confirm:
-                raise serializers.ValidationError({"new_password": "Passwords do not match."})
-
-            # Check old password inside validate instead of update
-            user = self.instance.user
-            if not user.check_password(old_password):
-                raise serializers.ValidationError({"old_password": "Old password is incorrect."})
-
-        return attrs
-
-    def validate_working_time(self, value):
-        return validate_working_time_format(value)
-
-    def to_internal_value(self, data):
-        data = data.copy() if hasattr(data, 'copy') else data
-        if 'workshop_images' in data:
-            from django.core.files.uploadedfile import UploadedFile
-            images = data.getlist('workshop_images') if hasattr(data, 'getlist') else data.get('workshop_images', [])
-            valid_images = [img for img in images if isinstance(img, UploadedFile)]
-            if hasattr(data, 'setlist'):
-                data.setlist('workshop_images', valid_images)
-            else:
-                data['workshop_images'] = valid_images
-        return super().to_internal_value(data)
-
-    def update(self, instance, validated_data):
-        old_password = validated_data.pop('old_password', None)
-        new_password = validated_data.pop('new_password', None)
-        validated_data.pop('new_password_confirm', None)
-        workshop_images = validated_data.pop('workshop_images', None)
-        deleted_image_ids = validated_data.pop('deleted_image_ids', [])
-
-        with transaction.atomic():
-            # Update profile fields
-            try:
-                instance = super().update(instance, validated_data)
-            except (ProgrammingError, OperationalError):
-                raise serializers.ValidationError({
-                    "error": "Database schema is out of date. Please run migrations."
-                })
-
-            # Handle password change if requested
-            if new_password:
-                user = instance.user
-                user.set_password(new_password)
-                user.save()
-
-            # Process image deletions
-            if deleted_image_ids:
-                instance.images.filter(id__in=deleted_image_ids).delete()
-
-            # Process new image additions (append instead of overwrite)
-            if workshop_images:
-                for img in workshop_images:
-                    if img:
-                        WorkshopProfileImages.objects.create(
-                            workshop_profile=instance,
-                            image=img
-                        )
-            return instance
 
 
