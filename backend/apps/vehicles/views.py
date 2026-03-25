@@ -1,10 +1,12 @@
 from django.shortcuts import render
-from .serializers import CarCreateSerializer, CarUpdateSerializer, VehicleBrandSerializer, VehicleModelSerializer
+from .serializers import CarCreateSerializer, CarUpdateSerializer, VehicleBrandSerializer, VehicleModelSerializer,CarSearchSerializer
 from rest_framework import generics, serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from .models import Car, DriverCar, VehicleBrand, VehicleModel
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOrReadOnly, IsWorkshopOrAdmin
+from django.db.models import Q
+
 
 # apps/vehicles/views.py
 from apps.users.models import Role
@@ -51,3 +53,29 @@ class VehicleModelListView(generics.ListAPIView):
         if brand_id:
             return VehicleModel.objects.filter(brand_id=brand_id)
         return VehicleModel.objects.all()
+    
+
+
+
+
+class CarSearchView(generics.ListAPIView):
+    serializer_class = CarSearchSerializer
+    permission_classes = [IsWorkshopOrAdmin]
+
+    def get_queryset(self):
+        query = self.request.query_params.get('q', '').strip().upper().replace(" ", "")
+
+        if not query:
+            return Car.objects.none()
+
+        queryset = Car.objects.select_related(
+            'owner__user',
+            'vehicle_model__brand'
+        )
+
+        # 🔍 Search (partial + flexible)
+        queryset = queryset.filter(
+            Q(car_plate_number__icontains=query)
+        )
+
+        return queryset.order_by('-created_at')[:10]  # limit 10 ta natija

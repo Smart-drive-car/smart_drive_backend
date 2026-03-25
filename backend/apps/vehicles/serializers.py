@@ -86,3 +86,35 @@ class CarCreateSerializer(serializers.ModelSerializer):
         #add vehicle model to car data and return it
         car.vehicle_model = validated_data.get('vehicle_model') 
         return car 
+    
+
+
+
+class CarSearchSerializer(serializers.ModelSerializer):
+    driver = serializers.SerializerMethodField()
+    vehicle = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Car
+        fields = [
+            'id',
+            'car_plate_number',
+            'vehicle',
+            'driver'
+        ]
+
+    def get_driver(self, obj):
+        if obj.owner:
+            return {
+                "full_name": obj.owner.full_name,
+                "phone_number": obj.owner.user.phone_number
+            }
+        return None
+
+    def get_vehicle(self, obj):
+        if obj.vehicle_model:
+            return {
+                "brand": obj.vehicle_model.brand.name,
+                "model": obj.vehicle_model.model_name
+            }
+        return None
