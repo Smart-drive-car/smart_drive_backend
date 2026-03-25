@@ -1,7 +1,7 @@
 from django.db import models
 from apps.shared.models import BaseModel
 from apps.vehicles.models import Car
-from apps.users.models import WorkshopProfile
+from apps.workshop.models import WorkshopProfile
 
 
 class ServiceType(BaseModel):

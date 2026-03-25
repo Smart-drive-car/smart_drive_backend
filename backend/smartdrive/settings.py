@@ -37,6 +37,8 @@ AUTH_USER_MODEL = 'users.User'
 apps = [
     'apps.users',
     'apps.shared',
+    'apps.driver',
+    'apps.workshop',
     'apps.vehicles',
     'apps.services',
 ]

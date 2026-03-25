@@ -1,7 +1,7 @@
 from django.db import models
 from pytz import timezone
 from apps.shared.models import BaseModel
-from apps.users.models import DriverProfile, User
+from apps.driver.models import DriverProfile
 
 
 class VehicleBrand(BaseModel):
