@@ -1,5 +1,5 @@
 from rest_framework import status
-from django.db.models import Avg, Count, FloatField, Value
+from django.db.models import Avg, Count, FloatField, Value, Q
 from django.db.models.functions import Coalesce
 from rest_framework.generics import UpdateAPIView, ListAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -49,7 +49,10 @@ class WorkshopListView(ListAPIView):
         queryset = WorkshopProfile.objects.all().prefetch_related('images')
         title = self.request.query_params.get('title')
         if title:
-            queryset = queryset.filter(title__icontains=title.strip())
+            query = title.strip()
+            queryset = queryset.filter(
+                Q(title__icontains=query) | Q(address__icontains=query)
+            )
         return queryset
 
 
