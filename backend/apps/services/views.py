@@ -1,10 +1,17 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
+import logging
 
 from .models import ServiceType, Service
 from .serializers import ServiceTypeSerializer, ServiceSerializer
 from .permissions import IsWorkshopOrReadOnly, IsAdminOnly
+from apps.users.models import UserDeviceToken
+from apps.shared.push_notifications import send_push_to_tokens
+from apps.vehicles.models import DriverCar
+
+
+logger = logging.getLogger(__name__)
 
 
 # 🔹 ServiceType → faqat ADMIN
@@ -44,7 +51,34 @@ class ServiceViewSet(viewsets.ModelViewSet):
         if user.role != 'WORKSHOP':
             raise PermissionDenied("Only workshop can create service")
 
-        serializer.save(workshop=user.workshopprofile)
+        service = serializer.save(workshop=user.workshopprofile)
+
+        try:
+            driver_profile = service.car.owner
+            if not driver_profile:
+                driver_car = DriverCar.objects.select_related('driver_profile__user').filter(car=service.car).first()
+                driver_profile = driver_car.driver_profile if driver_car else None
+
+            if not driver_profile:
+                return
+
+            tokens = UserDeviceToken.objects.filter(
+                user=driver_profile.user,
+                is_active=True
+            ).values_list('token', flat=True)
+
+            send_push_to_tokens(
+                tokens=tokens,
+                title='New service created',
+                body=f"{service.service_type.name} service was created by {service.workshop.title}.",
+                data={
+                    'event': 'service_created',
+                    'service_id': str(service.id),
+                    'car_id': str(service.car_id),
+                },
+            )
+        except Exception:
+            logger.exception('Failed to send service creation push notification.')
 
     def perform_update(self, serializer):
         service = self.get_object()

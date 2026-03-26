@@ -5,7 +5,7 @@ from apps.driver.models import DriverProfile
 from apps.workshop.models import WorkshopProfile, WorkshopProfileImages
 from apps.driver.serializers import DriverProfileLoginSerializer
 from apps.workshop.serializers import WorkshopProfileLoginSerializer, validate_working_time_format
-from .models import User, Role
+from .models import User, Role, DevicePlatform
 from django.db import transaction
 from django.db.utils import ProgrammingError, OperationalError
 from drf_spectacular.utils import extend_schema_field
@@ -272,6 +272,15 @@ class ChangePhoneVerifyOtpSerializer(serializers.Serializer):
             return normalize_phone_number(value)
         except ValueError as exc:
             raise serializers.ValidationError(str(exc))
+
+
+class DeviceTokenRegisterSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=512)
+    platform = serializers.ChoiceField(choices=DevicePlatform.choices)
+
+
+class DeviceTokenUnregisterSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=512)
 
 class RegisterConfirmSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)

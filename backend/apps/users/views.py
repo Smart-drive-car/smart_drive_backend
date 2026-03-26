@@ -2,14 +2,15 @@
 import uuid
 
 from django.utils import timezone
+from django.db import transaction
 from rest_framework.generics import GenericAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import OtpVerification, User, UserPasswordReset
-from .serializers import RegistrationSerializer, PasswordResetConfirmSerializer, CustomTokenObtainPairSerializer, ForgotPasswordSerializer, SendOtpSerializer, RegisterConfirmSerializer,UserDetailSerializer, ChangePhoneSendOtpSerializer, ChangePhoneVerifyOtpSerializer
+from .models import OtpVerification, User, UserPasswordReset, UserDeviceToken
+from .serializers import RegistrationSerializer, PasswordResetConfirmSerializer, CustomTokenObtainPairSerializer, ForgotPasswordSerializer, SendOtpSerializer, RegisterConfirmSerializer,UserDetailSerializer, ChangePhoneSendOtpSerializer, ChangePhoneVerifyOtpSerializer, DeviceTokenRegisterSerializer, DeviceTokenUnregisterSerializer
 from .utils import send_sms
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Role
@@ -332,18 +333,58 @@ class VerifyPhoneChangeOtpView(GenericAPIView):
             request.user.phone_number = new_phone_number
             request.user.save(update_fields=['phone_number'])
 
+            refresh = RefreshToken.for_user(request.user)
+
             return Response(
                 {
                     "message": "Phone number changed successfully.",
                     "user": UserDetailSerializer(request.user).data,
                     "tokens": {
-                        "refresh": str(RefreshToken.for_user(request.user)),
-                        "access": str(RefreshToken.for_user(request.user).access_token),
+                        "refresh": str(refresh),
+                        "access": str(refresh.access_token),
                     }
                 },
                 status=status.HTTP_200_OK
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RegisterDeviceTokenView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = DeviceTokenRegisterSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data['token']
+        platform = serializer.validated_data['platform']
+
+        with transaction.atomic():
+            UserDeviceToken.objects.update_or_create(
+                token=token,
+                defaults={
+                    'user': request.user,
+                    'platform': platform,
+                    'is_active': True,
+                }
+            )
+
+        return Response({'message': 'Device token registered successfully.'}, status=status.HTTP_200_OK)
+
+
+class UnregisterDeviceTokenView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = DeviceTokenUnregisterSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data['token']
+        UserDeviceToken.objects.filter(user=request.user, token=token).update(is_active=False)
+
+        return Response({'message': 'Device token unregistered successfully.'}, status=status.HTTP_200_OK)
 
 

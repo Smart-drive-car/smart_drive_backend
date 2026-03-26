@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import (ForgotPasswordView, LoginView, PasswordResetConfirmView, RegisterView, SendOtpView, UserDetailView, VerifyOtpView,VerifyPasswordResetOtpView, SendPhoneChangeOtpView, VerifyPhoneChangeOtpView)
+from .views import (ForgotPasswordView, LoginView, PasswordResetConfirmView, RegisterView, SendOtpView, UserDetailView, VerifyOtpView,VerifyPasswordResetOtpView, SendPhoneChangeOtpView, VerifyPhoneChangeOtpView, RegisterDeviceTokenView, UnregisterDeviceTokenView)
 from apps.driver.views import DriverProfileUpdateView
 from apps.workshop.views import WorkshopProfileUpdateView, WorkshopListView
 
@@ -14,6 +14,8 @@ urlpatterns = [
     path('profile/', UserDetailView.as_view(), name='profile'),
     path('profile/change-phone/send-otp/', SendPhoneChangeOtpView.as_view(), name='profile_change_phone_send_otp'),
     path('profile/change-phone/verify-otp/', VerifyPhoneChangeOtpView.as_view(), name='profile_change_phone_verify_otp'),
+    path('notifications/device-token/register/', RegisterDeviceTokenView.as_view(), name='register_device_token'),
+    path('notifications/device-token/unregister/', UnregisterDeviceTokenView.as_view(), name='unregister_device_token'),
     path('workshops/', WorkshopListView.as_view(), name='workshop_list_legacy'),
     path('profile/driver/update/', DriverProfileUpdateView.as_view(), name='driver_profile_update_legacy'),
     path('profile/workshop/update/', WorkshopProfileUpdateView.as_view(), name='workshop_profile_update_legacy'),

@@ -107,3 +107,21 @@ class UserPasswordReset(models.Model):
     @property
     def is_valid(self):
         return self.created_at > timezone.now() - timezone.timedelta(minutes=15)
+
+
+class DevicePlatform(models.TextChoices):
+    ANDROID = 'ANDROID', 'Android'
+    IOS = 'IOS', 'iOS'
+
+
+class UserDeviceToken(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='device_tokens')
+    token = models.CharField(max_length=512, unique=True)
+    platform = models.CharField(max_length=10, choices=DevicePlatform.choices)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f"{self.user.phone_number} - {self.platform}"
