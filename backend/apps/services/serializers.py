@@ -9,7 +9,7 @@ class ServiceTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceType
         fields = ["id", "name", "owner", "is_global", "created_at", "updated_at"]
-        read_only_fields = ["owner"]
+        read_only_fields = ["owner", "is_global", "created_at", "updated_at"]
 
     def get_is_global(self, obj):
         return obj.owner is None
