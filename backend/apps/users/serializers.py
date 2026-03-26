@@ -252,6 +252,27 @@ class SendOtpSerializer(serializers.Serializer):
         except ValueError as exc:
             raise serializers.ValidationError(str(exc))
 
+
+class ChangePhoneSendOtpSerializer(serializers.Serializer):
+    new_phone_number = serializers.CharField(max_length=20)
+
+    def validate_new_phone_number(self, value):
+        try:
+            return normalize_phone_number(value)
+        except ValueError as exc:
+            raise serializers.ValidationError(str(exc))
+
+
+class ChangePhoneVerifyOtpSerializer(serializers.Serializer):
+    new_phone_number = serializers.CharField(max_length=20)
+    code = serializers.CharField(max_length=6)
+
+    def validate_new_phone_number(self, value):
+        try:
+            return normalize_phone_number(value)
+        except ValueError as exc:
+            raise serializers.ValidationError(str(exc))
+
 class RegisterConfirmSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)
     code = serializers.CharField(max_length=6)   
