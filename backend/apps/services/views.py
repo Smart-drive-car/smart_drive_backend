@@ -4,14 +4,38 @@ from rest_framework.exceptions import PermissionDenied
 
 from .models import ServiceType, Service
 from .serializers import ServiceTypeSerializer, ServiceSerializer
-from .permissions import IsWorkshopOrReadOnly, IsAdminOnly
+from .permissions import IsWorkshopOrReadOnly, IsAdminOnly, IsServiceTypeOwnerOrAdmin
 
 
-# 🔹 ServiceType → faqat ADMIN
+# 🔹 ServiceType → ADMIN (global) + WORKSHOP (o'ziga tegishli)
 class ServiceTypeViewSet(viewsets.ModelViewSet):
     queryset = ServiceType.objects.all()
     serializer_class = ServiceTypeSerializer
-    permission_classes = [IsAuthenticated, IsAdminOnly]
+    permission_classes = [IsAuthenticated, IsServiceTypeOwnerOrAdmin]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        # 🛠 Workshop → global (owner=None) + o'ziga tegishli (owner=o'zi)
+        if user.role == 'WORKSHOP':
+            return ServiceType.objects.filter(
+                models.Q(owner=None) | models.Q(owner=user.workshopprofile)
+            )
+
+        # 👑 Admin → hammasi
+        if user.role == 'ADMIN':
+            return ServiceType.objects.all()
+
+        return ServiceType.objects.none()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user.role == 'WORKSHOP':
+            serializer.save(owner=user.workshopprofile)
+        elif user.role == 'ADMIN':
+            serializer.save(owner=None)
+        else:
+            raise PermissionDenied("Only Admin or Workshop can create service types")
 
 
 # 🔹 Service → asosiy logic

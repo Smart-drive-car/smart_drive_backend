@@ -4,9 +4,15 @@ from apps.vehicles.models import DriverCar
 
 
 class ServiceTypeSerializer(serializers.ModelSerializer):
+    is_global = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = ServiceType
-        fields = '__all__'
+        fields = ["id", "name", "owner", "is_global", "created_at", "updated_at"]
+        read_only_fields = ["owner"]
+
+    def get_is_global(self, obj):
+        return obj.owner is None
 
 
 class ServiceSerializer(serializers.ModelSerializer):

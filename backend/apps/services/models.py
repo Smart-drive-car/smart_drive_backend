@@ -6,6 +6,13 @@ from apps.workshop.models import WorkshopProfile
 
 class ServiceType(BaseModel):
     name = models.CharField(max_length=100, unique=True)
+    owner = models.ForeignKey(
+        'workshop.WorkshopProfile',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='service_types'
+    )
 
     def __str__(self):
         return self.name
