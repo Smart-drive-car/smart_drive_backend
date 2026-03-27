@@ -1,16 +1,17 @@
-from datetime import timedelta
-
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.validators import RegexValidator
 from apps.shared.models import BaseModel
 from django.utils import timezone
 import uuid
+from .phone_utils import normalize_phone_number
 
 class UserManager(BaseUserManager):
     def create_user(self, phone_number, password=None, **extra_fields):
         if not phone_number:
             raise ValueError('Users must have a phone number')
+
+        phone_number = normalize_phone_number(phone_number)
 
         user = self.model(
             phone_number=phone_number,
@@ -62,35 +63,6 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         ordering = ['-created_at']
     
 
-class DriverProfile(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    full_name = models.CharField(max_length=255)
-    image = models.ImageField(upload_to='driver_profiles/', null=True, blank=True)
-
-
-    def __str__(self):
-        return f"{self.full_name} - {self.user}"
-
-    
-
-class WorkshopProfile(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
-    address = models.CharField(max_length=255)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-
-
-    def __str__(self):
-        return f"{self.title} - {self.user}"
-    
-class WorkshopProfileImages(BaseModel):
-    workshop_profile = models.ForeignKey(WorkshopProfile, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='workshop_profiles/')
-
-    def __str__(self):
-        return f"Image for {self.workshop_profile}"
-
 
 class AdminProfile(BaseModel):
     user       = models.OneToOneField(User, on_delete=models.CASCADE, related_name="admin_profile")
@@ -135,3 +107,21 @@ class UserPasswordReset(models.Model):
     @property
     def is_valid(self):
         return self.created_at > timezone.now() - timezone.timedelta(minutes=15)
+
+
+class DevicePlatform(models.TextChoices):
+    ANDROID = 'ANDROID', 'Android'
+    IOS = 'IOS', 'iOS'
+
+
+class UserDeviceToken(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='device_tokens')
+    token = models.CharField(max_length=512, unique=True)
+    platform = models.CharField(max_length=10, choices=DevicePlatform.choices)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f"{self.user.phone_number} - {self.platform}"

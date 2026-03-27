@@ -4,17 +4,13 @@ import os
 from os import getenv
 from dotenv import load_dotenv
 load_dotenv()
-import firebase_admin
-from firebase_admin import credentials
 
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Path to your downloaded JSON file
-# cred = credentials.Certificate(f"{BASE_DIR}/firebase/firebase_credentials.json")
-# firebase_admin.initialize_app(cred)
+FIREBASE_CREDENTIALS_PATH = getenv('FIREBASE_CREDENTIALS_PATH')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -37,7 +33,10 @@ AUTH_USER_MODEL = 'users.User'
 apps = [
     'apps.users',
     'apps.shared',
+    'apps.driver',
+    'apps.workshop',
     'apps.vehicles',
+    'apps.services',
 ]
 
 libs = [
@@ -148,7 +147,7 @@ DB_PORT = getenv('DB_PORT')
 ESKIZ_EMAIL = getenv('ESKIZ_EMAIL')
 ESKIZ_SECRET_KEY = getenv('ESKIZ_SECRET_KEY')
 
-
+   
 DATABASES = {
     'default': {
         'ENGINE': DB_ENGINE,

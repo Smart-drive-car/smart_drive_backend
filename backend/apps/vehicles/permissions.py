@@ -1,4 +1,6 @@
 from rest_framework import permissions
+from rest_framework.permissions import BasePermission
+from apps.users.models import Role
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
@@ -15,3 +17,15 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         elif hasattr(obj, 'user'):
             return obj.user == request.user
         return False
+
+
+# apps/vehicles/permissions.py
+
+
+
+class IsWorkshopOrAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated and
+            request.user.role in [Role.WORKSHOP, Role.ADMIN]
+        )

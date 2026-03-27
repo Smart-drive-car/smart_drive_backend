@@ -1,7 +1,7 @@
 from django.db import models
 from pytz import timezone
 from apps.shared.models import BaseModel
-from apps.users.models import DriverProfile, User
+from apps.driver.models import DriverProfile
 
 
 class VehicleBrand(BaseModel):
@@ -23,7 +23,7 @@ class Car(BaseModel):
     owner = models.ForeignKey(DriverProfile, on_delete=models.CASCADE, related_name='owned_cars', null=True, blank=True)
     vehicle_model = models.ForeignKey(VehicleModel, on_delete=models.SET_NULL, null=True)
     car_plate_number = models.CharField(max_length=20, unique=True)
-    # year = models.PositiveIntegerField(null=True, blank=True)
+    released_year = models.PositiveIntegerField(null=True, blank=True)
     current_mileage = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
@@ -41,4 +41,5 @@ class DriverCar(BaseModel):
     
     class Meta:
         unique_together = ('driver_profile', 'car')
+
 

@@ -1,31 +1,26 @@
 
-
-
-from .serializers import DriverProfileUpdateSerializer, WorkshopProfileUpdateSerializer
-from rest_framework.generics import UpdateAPIView
-from .permissions import IsDriver, IsWorkshop, IsOwnDriverProfile, IsOwnWorkshopProfile
-import re
 import uuid
 
 from django.utils import timezone
-from django.shortcuts import render
-from rest_framework.views import APIView
-from rest_framework.generics import GenericAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
+from django.db import transaction
+from rest_framework.generics import GenericAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from django.core.cache import cache
-from .models import OtpVerification, User, Role, DriverProfile, UserPasswordReset, WorkshopProfile
-from .serializers import TestRegisterSerializer, RegistrationSerializer, PasswordResetConfirmSerializer, CustomTokenObtainPairSerializer, ForgotPasswordSerializer, SendOtpSerializer, RegisterConfirmSerializer,UserDetailSerializer
-from .utils import send_eskiz_sms, send_sms
-from django.db import transaction
+from .models import OtpVerification, User, UserPasswordReset, UserDeviceToken
+from .serializers import RegistrationSerializer, PasswordResetConfirmSerializer, CustomTokenObtainPairSerializer, ForgotPasswordSerializer, SendOtpSerializer, RegisterConfirmSerializer,UserDetailSerializer, ChangePhoneSendOtpSerializer, ChangePhoneVerifyOtpSerializer, DeviceTokenRegisterSerializer, DeviceTokenUnregisterSerializer
+from .utils import send_sms
 from rest_framework_simplejwt.tokens import RefreshToken
-from drf_spectacular.utils import extend_schema
+from .models import Role
 
-from firebase_admin import auth as firebase_auth
-from django.shortcuts import get_object_or_404
+
+def get_user_by_normalized_phone(phone_number):
+    user = User.objects.filter(phone_number=phone_number).first()
+    if user:
+        return user
+    return User.objects.filter(phone_number__endswith=phone_number).first()
 
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -44,6 +39,13 @@ class RegisterView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             phone = serializer.validated_data['phone_number']
+
+            is_user_exists = User.objects.filter(phone_number=phone).exists()
+            if is_user_exists:
+                return Response(
+                    {"error": "User with this phone number already exists."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             # Ensure phone number was verified before registration
             verified_otp = OtpVerification.objects.filter(phone_number=phone, is_used=True).first()
@@ -136,7 +138,8 @@ class ForgotPasswordView(GenericAPIView):
         if serializer.is_valid():
             phone = serializer.validated_data['phone_number']
 
-            if not User.objects.filter(phone_number=phone).exists():
+            user = get_user_by_normalized_phone(phone)
+            if not user:
                 return Response({"error": "User with this phone number not found."}, status=status.HTTP_404_NOT_FOUND)
 
             otp = send_sms(phone)
@@ -177,9 +180,8 @@ class VerifyPasswordResetOtpView(GenericAPIView):
             otp_record.is_used = True
             otp_record.save()
 
-            try:
-                user = User.objects.get(phone_number=phone)
-            except User.DoesNotExist:
+            user = get_user_by_normalized_phone(phone)
+            if not user:
                 return Response({"error": "User with this phone number not found."}, status=status.HTTP_404_NOT_FOUND)
 
             # Create (or replace) a fresh reset token
@@ -217,7 +219,16 @@ class PasswordResetConfirmView(GenericAPIView):
 
             password_reset.delete()
 
-            return Response({"message": "Password reset successfully. You can now log in."}, status=status.HTTP_200_OK)
+            refresh = RefreshToken.for_user(user)
+
+            return Response({
+                "message": "Password reset successfully.",
+                "tokens": {
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                },
+                "user": UserDetailSerializer(user).data,
+            }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -232,39 +243,148 @@ class UserDetailView(GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class SendPhoneChangeOtpView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChangePhoneSendOtpSerializer
 
-class DriverProfileUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsDriver, IsOwnDriverProfile]
-    parser_classes = (MultiPartParser, FormParser)
-    serializer_class = DriverProfileUpdateSerializer
+    def post(self, request):
+        if request.user.role not in [Role.DRIVER, Role.WORKSHOP]:
+            return Response(
+                {"error": "Only driver and workshop users can change phone number."},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
-    def get_object(self):
-        return self.request.user.driverprofile
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            self.perform_update(serializer)
-            return Response({"message": "Driver profile updated successfully.", "data": serializer.data}, status=status.HTTP_200_OK)
-        return Response({"error": "Failed to update profile", "details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            new_phone_number = serializer.validated_data['new_phone_number']
 
-class WorkshopProfileUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsWorkshop, IsOwnWorkshopProfile]
-    parser_classes = (MultiPartParser, FormParser)
-    serializer_class = WorkshopProfileUpdateSerializer
+            if new_phone_number == request.user.phone_number:
+                return Response(
+                    {"error": "New phone number must be different from current phone number."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-    def get_object(self):
-        return self.request.user.workshopprofile
+            if User.objects.filter(phone_number=new_phone_number).exclude(pk=request.user.pk).exists():
+                return Response(
+                    {"error": "User with this phone number already exists."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            otp = send_sms(new_phone_number)
+            if otp:
+                OtpVerification.objects.update_or_create(
+                    phone_number=new_phone_number,
+                    defaults={
+                        "code": otp,
+                        "expires_at": timezone.now() + timezone.timedelta(minutes=5),
+                        "attempts": 0,
+                        "is_used": False
+                    }
+                )
+
+            return Response(
+                {"message": "OTP sent successfully.", "otp_code": otp},
+                status=status.HTTP_200_OK
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VerifyPhoneChangeOtpView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChangePhoneVerifyOtpSerializer
+
+    def post(self, request):
+        if request.user.role not in [Role.DRIVER, Role.WORKSHOP]:
+            return Response(
+                {"error": "Only driver and workshop users can change phone number."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            self.perform_update(serializer)
-            return Response({"message": "Workshop profile updated successfully.", "data": serializer.data}, status=status.HTTP_200_OK)
-        return Response({"error": "Failed to update profile", "details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            new_phone_number = serializer.validated_data['new_phone_number']
+            code = serializer.validated_data['code']
+
+            if new_phone_number == request.user.phone_number:
+                return Response(
+                    {"error": "New phone number must be different from current phone number."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if User.objects.filter(phone_number=new_phone_number).exclude(pk=request.user.pk).exists():
+                return Response(
+                    {"error": "User with this phone number already exists."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            otp_record = OtpVerification.objects.filter(
+                phone_number=new_phone_number,
+                code=code,
+                is_used=False
+            ).first()
+
+            if not otp_record or not otp_record.is_valid():
+                return Response({"error": "Invalid or expired OTP code."}, status=status.HTTP_400_BAD_REQUEST)
+
+            otp_record.is_used = True
+            otp_record.save(update_fields=['is_used'])
+
+            request.user.phone_number = new_phone_number
+            request.user.save(update_fields=['phone_number'])
+
+            refresh = RefreshToken.for_user(request.user)
+
+            return Response(
+                {
+                    "message": "Phone number changed successfully.",
+                    "user": UserDetailSerializer(request.user).data,
+                    "tokens": {
+                        "refresh": str(refresh),
+                        "access": str(refresh.access_token),
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RegisterDeviceTokenView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = DeviceTokenRegisterSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data['token']
+        platform = serializer.validated_data['platform']
+
+        with transaction.atomic():
+            UserDeviceToken.objects.update_or_create(
+                token=token,
+                defaults={
+                    'user': request.user,
+                    'platform': platform,
+                    'is_active': True,
+                }
+            )
+
+        return Response({'message': 'Device token registered successfully.'}, status=status.HTTP_200_OK)
+
+
+class UnregisterDeviceTokenView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = DeviceTokenUnregisterSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data['token']
+        UserDeviceToken.objects.filter(user=request.user, token=token).update(is_active=False)
+
+        return Response({'message': 'Device token unregistered successfully.'}, status=status.HTTP_200_OK)
 
 

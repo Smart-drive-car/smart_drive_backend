@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from .models import User, DriverProfile, WorkshopProfile, AdminProfile, OtpVerification
+from .models import User, AdminProfile, OtpVerification
 
 # 1. THE CREATION FORM
 class MyUserCreationForm(forms.ModelForm):
@@ -65,16 +65,6 @@ class UserAdmin(BaseUserAdmin):
 
     filter_horizontal = ()
 
-
-@admin.register(DriverProfile)
-class DriverProfileAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'user', 'created_at')
-    search_fields = ('full_name', 'user__phone_number')
-
-@admin.register(WorkshopProfile)
-class WorkshopProfileAdmin(admin.ModelAdmin):
-    list_display = ('title', 'user', 'created_at')
-    search_fields = ('title', 'user__phone_number')
 
 @admin.register(AdminProfile)
 class AdminProfileAdmin(admin.ModelAdmin):
