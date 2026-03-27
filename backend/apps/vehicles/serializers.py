@@ -107,7 +107,8 @@ class CarSearchSerializer(serializers.ModelSerializer):
         if obj.owner:
             return {
                 "full_name": obj.owner.full_name,
-                "phone_number": obj.owner.user.phone_number
+                "phone_number": obj.owner.user.phone_number,
+                "image": obj.owner.image.url if obj.owner.image else None 
             }
         return None
 

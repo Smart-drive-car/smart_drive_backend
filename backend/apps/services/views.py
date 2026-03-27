@@ -2,23 +2,44 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 import logging
+from django.db import models
 
 from .models import ServiceType, Service
 from .serializers import ServiceTypeSerializer, ServiceSerializer
-from .permissions import IsWorkshopOrReadOnly, IsAdminOnly
 from apps.users.models import UserDeviceToken
 from apps.shared.push_notifications import send_push_to_tokens
 from apps.vehicles.models import DriverCar
 
 
 logger = logging.getLogger(__name__)
+from .permissions import IsWorkshopOrReadOnly, IsAdminOnly, IsServiceTypeOwnerOrAdmin, IsAdminOrWorkshopReadOnly
 
 
-# 🔹 ServiceType → faqat ADMIN
+# 🔹 ServiceType → ADMIN (global) + WORKSHOP (o'ziga tegishli)
 class ServiceTypeViewSet(viewsets.ModelViewSet):
     queryset = ServiceType.objects.all()
     serializer_class = ServiceTypeSerializer
-    permission_classes = [IsAuthenticated, IsAdminOnly]
+    permission_classes = [IsAuthenticated, IsAdminOrWorkshopReadOnly]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        # 🛠 Workshop → faqat read
+        if user.role == 'WORKSHOP':
+            return ServiceType.objects.all()
+
+        # 👑 Admin → hammasi
+        if user.role == 'ADMIN':
+            return ServiceType.objects.all()
+
+        return ServiceType.objects.none()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user.role == 'ADMIN':
+            serializer.save()
+        else:
+            raise PermissionDenied("Only Admin can create service types")
 
 
 # 🔹 Service → asosiy logic
