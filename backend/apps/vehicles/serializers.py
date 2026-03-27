@@ -2,6 +2,34 @@
 from rest_framework import serializers
 from .models import Car, DriverCar, VehicleModel, VehicleBrand
 
+class GPSPointSerializer(serializers.Serializer):
+    lat = serializers.FloatField(min_value=-90, max_value=90)
+    lng = serializers.FloatField(min_value=-180, max_value=180)
+    timestamp = serializers.DateTimeField()
+    speed = serializers.FloatField(required=False)
+    accuracy = serializers.FloatField(required=False)
+
+class MileageBatchSerializer(serializers.Serializer):
+    car_id = serializers.IntegerField()
+    trip_id = serializers.CharField(max_length=100, required=False)
+    points = GPSPointSerializer(many=True)
+
+    def validate_points(self, points):
+        if not points:
+            raise serializers.ValidationError("Points array cannot be empty.")
+        
+        # Sort points by timestamp to ensure chronological order
+        points.sort(key=lambda x: x['timestamp'])
+        
+        # Validate logical timestamps (no future dates)
+        from django.utils import timezone
+        now = timezone.now()
+        for point in points:
+            if point['timestamp'] > now:
+                raise serializers.ValidationError("Timestamp cannot be in the future.")
+                
+        return points
+
 class VehicleBrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = VehicleBrand
