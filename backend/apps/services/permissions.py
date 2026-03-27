@@ -25,17 +25,16 @@ class IsAdminOnly(BasePermission):
         return request.user.role == 'ADMIN'
 
 
-class IsAdminOrWorkshopReadOnly(BasePermission):
+class IsAdminOrReadOnly(BasePermission):
     """
     ADMIN -> CRUD
-    WORKSHOP -> GET only
-    DRIVER -> No access
+    WORKSHOP, DRIVER -> GET only
     """
     def has_permission(self, request, view):
         user = request.user
         if user.role == 'ADMIN':
             return True
-        if user.role == 'WORKSHOP' and request.method in SAFE_METHODS:
+        if user.role in ['WORKSHOP', 'DRIVER'] and request.method in SAFE_METHODS:
             return True
         return False
 

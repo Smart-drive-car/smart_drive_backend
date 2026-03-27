@@ -12,20 +12,20 @@ from apps.vehicles.models import DriverCar
 
 
 logger = logging.getLogger(__name__)
-from .permissions import IsWorkshopOrReadOnly, IsAdminOnly, IsServiceTypeOwnerOrAdmin, IsAdminOrWorkshopReadOnly
+from .permissions import IsWorkshopOrReadOnly, IsAdminOnly, IsServiceTypeOwnerOrAdmin, IsAdminOrReadOnly
 
 
-# 🔹 ServiceType → ADMIN (global) + WORKSHOP (o'ziga tegishli)
+# 🔹 ServiceType → ADMIN (global) + WORKSHOP & DRIVER (read only)
 class ServiceTypeViewSet(viewsets.ModelViewSet):
     queryset = ServiceType.objects.all()
     serializer_class = ServiceTypeSerializer
-    permission_classes = [IsAuthenticated, IsAdminOrWorkshopReadOnly]
+    permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
 
     def get_queryset(self):
         user = self.request.user
 
-        # 🛠 Workshop → faqat read
-        if user.role == 'WORKSHOP':
+        # 🛠 Workshop & 🚗 Driver → faqat read
+        if user.role in ['WORKSHOP', 'DRIVER']:
             return ServiceType.objects.all()
 
         # 👑 Admin → hammasi

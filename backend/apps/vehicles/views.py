@@ -6,6 +6,13 @@ from rest_framework.exceptions import PermissionDenied
 from .models import Car, DriverCar, VehicleBrand, VehicleModel
 from .permissions import IsOwnerOrReadOnly, IsWorkshopOrAdmin
 from django.db.models import Q
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.db import transaction
+from drf_spectacular.utils import extend_schema
+from .serializers import MileageBatchSerializer
+from .utils import clean_gps_points, calculate_total_distance
 
 
 # apps/vehicles/views.py
@@ -79,3 +86,52 @@ class CarSearchView(generics.ListAPIView):
         )
 
         return queryset.order_by('-created_at')[:10]  # limit 10 ta natija
+
+class UpdateMileageView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    @extend_schema(
+        request=MileageBatchSerializer,
+        responses={200: MileageBatchSerializer},
+        summary="Update the mileage of a car",
+        description="Receive a batch of GPS points, clean the data, calculate real distance, and update total car mileage."
+    )
+    def post(self, request):
+        if request.user.role != Role.DRIVER:
+             raise PermissionDenied("Only drivers can update mileage.")
+
+        serializer = MileageBatchSerializer(data=request.data)
+        if serializer.is_valid():
+            car_id = serializer.validated_data['car_id']
+            raw_points = serializer.validated_data['points']
+            
+            # Step 3: Clean data
+            cleaned_points = clean_gps_points(raw_points)
+            
+            # Step 4: Calculate distance
+            distance_travelled_km = calculate_total_distance(cleaned_points)
+            
+            # Step 5: Update the database safely
+            try:
+                with transaction.atomic():
+                    # select_for_update() prevents race conditions if multiple batches arrive fast
+                    car = Car.objects.select_for_update().get(id=car_id, owner=request.user.driverprofile)
+                    
+                    if not car.current_mileage:
+                        car.current_mileage = 0
+                        
+                    # convert float distance to int (assuming current_mileage is stored as integer kilometers)
+                    car.current_mileage += int(round(distance_travelled_km))
+                    car.save()
+                    
+            except Car.DoesNotExist:
+                return Response({"error": "Car not found or you are not the owner."}, status=status.HTTP_404_NOT_FOUND)
+                
+            # Step 6: Return new total to Flutter
+            return Response({
+                "message": "Mileage updated",
+                "distance_added_km": round(distance_travelled_km, 3),
+                "new_current_mileage": car.current_mileage
+            }, status=status.HTTP_200_OK)
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
