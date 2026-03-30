@@ -72,8 +72,6 @@ class CarSearchView(generics.ListAPIView):
     def get_queryset(self):
         query = self.request.query_params.get('q', '').strip().upper().replace(" ", "")
 
-        if not query:
-            return Car.objects.none()
 
         queryset = Car.objects.select_related(
             'owner__user',

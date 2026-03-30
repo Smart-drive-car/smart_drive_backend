@@ -88,7 +88,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
                 is_active=True
             ).values_list('token', flat=True)
 
-            send_push_to_tokens(
+            result = send_push_to_tokens(
                 tokens=tokens,
                 title='New service created',
                 body=f"{service.service_type.name} service was created by {service.workshop.title}.",
@@ -98,6 +98,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
                     'car_id': str(service.car_id),
                 },
             )
+            print(f"Push notification result: {result}")
         except Exception:
             logger.exception('Failed to send service creation push notification.')
 
