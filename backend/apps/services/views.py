@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 import logging
@@ -7,7 +7,7 @@ from django.db import models
 from .models import ServiceType, Service
 from .serializers import ServiceTypeSerializer, ServiceSerializer
 from apps.users.models import UserDeviceToken
-from apps.shared.push_notifications import send_push_to_tokens
+from apps.shared.push_notifications import send_push_to_tokens, send_notification_to_user
 from apps.vehicles.models import DriverCar
 
 
@@ -46,6 +46,8 @@ class ServiceTypeViewSet(viewsets.ModelViewSet):
 class ServiceViewSet(viewsets.ModelViewSet):
     serializer_class = ServiceSerializer
     permission_classes = [IsAuthenticated, IsWorkshopOrReadOnly]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['service_type__name', 'workshop__title', 'car__car_plate_number', 'description']
 
     def get_queryset(self):
         user = self.request.user
@@ -83,13 +85,8 @@ class ServiceViewSet(viewsets.ModelViewSet):
             if not driver_profile:
                 return
 
-            tokens = UserDeviceToken.objects.filter(
+            result = send_notification_to_user(
                 user=driver_profile.user,
-                is_active=True
-            ).values_list('token', flat=True)
-
-            result = send_push_to_tokens(
-                tokens=tokens,
                 title='New service created',
                 body=f"{service.service_type.name} service was created by {service.workshop.title}.",
                 data={

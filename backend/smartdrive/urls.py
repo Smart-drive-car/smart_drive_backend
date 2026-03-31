@@ -31,7 +31,9 @@ urlpatterns = [
     path('api/workshops/', include('apps.workshop.urls')),
     path('api/vehicles/', include('apps.vehicles.urls')),
     path('api/services/', include('apps.services.urls')),
+    path('api/', include('apps.shared.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'), 
+
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

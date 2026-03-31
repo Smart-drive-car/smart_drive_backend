@@ -60,3 +60,26 @@ def send_push_to_tokens(tokens, title, body, data=None):
     except Exception:
         logger.exception('Failed to send push notification via FCM.')
         return None
+
+def send_notification_to_user(user, title, body, data=None):
+    from apps.shared.models import Notification
+    from apps.users.models import UserDeviceToken
+
+    # Create the notification in DB
+    Notification.objects.create(
+        user=user,
+        title=title,
+        body=body,
+        data=data or {}
+    )
+
+    # Get active device tokens
+    tokens = UserDeviceToken.objects.filter(
+        user=user,
+        is_active=True
+    ).values_list('token', flat=True)
+
+    if tokens:
+        return send_push_to_tokens(tokens, title, body, data)
+    return None
+

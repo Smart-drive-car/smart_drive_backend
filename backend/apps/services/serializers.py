@@ -50,6 +50,8 @@ class ServiceSerializer(serializers.ModelSerializer):
                     "address": instance.workshop.address,
                     "phone_number": str(instance.workshop.user.phone_number) if instance.workshop.user else None,
                     "image": workshop_image_url,
+                    "lat": float(instance.workshop.latitude) if instance.workshop.latitude else None,
+                    "lng": float(instance.workshop.longitude) if instance.workshop.longitude else None,
                 }
 
             # Service Type Details
