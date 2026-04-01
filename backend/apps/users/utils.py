@@ -70,7 +70,7 @@ def send_sms(phone_number):
     }
     data = {
         "phone": "998" + phone_number,
-        "message": f"1Smart Drive ilovasi - amaliyotni tasdiqlash kodi: {otp}",
+        "message": f"Smart Drive ilovasi - amaliyotni tasdiqlash kodi: {otp}",
         # "message": f"SmartDrive tasdiqlash kodi: {otp}",
     }
     response = requests.post(url, headers=headers, json=data)
