@@ -46,10 +46,11 @@ class WorkshopProfileListSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
     total_customers = serializers.IntegerField(read_only=True)
     rating = serializers.FloatField(source='average_rating', read_only=True)
+    phone_number = serializers.CharField(source='user.phone_number', read_only=True)
 
     class Meta:
         model = WorkshopProfile
-        fields = ['id', 'title', 'address', 'description', 'working_time', 'latitude', 'longitude', 'images', 'total_customers', 'rating']
+        fields = ['id', 'title', 'address', 'description', 'working_time', 'latitude', 'longitude', 'images', 'total_customers', 'rating', 'phone_number']
 
     def get_images(self, obj):
         try:
@@ -62,12 +63,13 @@ class WorkshopDetailSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
     total_customers = serializers.IntegerField(read_only=True)
     rating = serializers.FloatField(source='average_rating', read_only=True)
+    phone_number = serializers.CharField(source='user.phone_number', read_only=True)
 
     class Meta:
         model = WorkshopProfile
         fields = [
             'id', 'title', 'address', 'description', 'working_time',
-            'latitude', 'longitude', 'images', 'total_customers', 'rating'
+            'latitude', 'longitude', 'images', 'total_customers', 'rating', 'phone_number'
         ]
 
     def get_images(self, obj):
