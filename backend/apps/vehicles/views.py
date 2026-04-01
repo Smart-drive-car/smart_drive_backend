@@ -39,10 +39,11 @@ class VehicleRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
-        # Additional safety: ensure users can only query their own cars
-        # If admin needs access, we can adjust here.
-        if self.request.user.role == Role.DRIVER:
-            return Car.objects.filter(owner=self.request.user.driverprofile)
+        user = self.request.user
+        if user.role == Role.DRIVER:
+            return Car.objects.filter(owner=user.driverprofile)
+        elif user.role in [Role.WORKSHOP, Role.ADMIN]:
+            return Car.objects.all()
         return Car.objects.none()
 
 class VehicleBrandListView(generics.ListAPIView):
