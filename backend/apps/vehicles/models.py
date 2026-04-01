@@ -24,7 +24,8 @@ class Car(BaseModel):
     vehicle_model = models.ForeignKey(VehicleModel, on_delete=models.SET_NULL, null=True)
     car_plate_number = models.CharField(max_length=20, unique=True)
     released_year = models.PositiveIntegerField(null=True, blank=True)
-    current_mileage = models.PositiveIntegerField(null=True, blank=True)
+    current_mileage = models.FloatField(null=True, blank=True)
+    initial_mileage = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.car_plate_number} ({self.vehicle_model})"

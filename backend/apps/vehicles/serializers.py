@@ -50,7 +50,7 @@ class CarUpdateSerializer(serializers.ModelSerializer):
         required=False
     )
     vehicle_model = VehicleModelSerializer(read_only=True)
-    current_mileage = serializers.IntegerField(required=False, min_value=0)
+    current_mileage = serializers.FloatField(required=False, min_value=0.0)
     released_year = serializers.IntegerField(required=False, min_value=1886)
     car_plate_number = serializers.CharField(max_length=20, required=False, allow_blank=False)
 
@@ -77,7 +77,7 @@ class CarCreateSerializer(serializers.ModelSerializer):
 
     car_plate_number = serializers.CharField(max_length=20, required=True, allow_blank=False)
     released_year = serializers.IntegerField(required=False, allow_null=True, min_value=1886)
-    current_mileage = serializers.IntegerField(required=False, default=0, min_value=0)
+    current_mileage = serializers.FloatField(required=False, default=0.0, min_value=0.0)
 
     class Meta:
         model = Car
@@ -98,12 +98,14 @@ class CarCreateSerializer(serializers.ModelSerializer):
         plate = validated_data.get('car_plate_number')
 
         # Create the car with owner set to the current driver
+        current_mileage = validated_data.get('current_mileage', 0.0)
         car = Car.objects.create(
             owner=driver_profile,
             car_plate_number=plate,
             vehicle_model=validated_data.get('vehicle_model'),
             released_year=validated_data.get('released_year'),
-            current_mileage=validated_data.get('current_mileage')
+            current_mileage=current_mileage,
+            initial_mileage=current_mileage
         )
 
         # Link the car to the Driver's profile via DriverCar for backward compatibility
