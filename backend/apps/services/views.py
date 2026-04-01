@@ -75,7 +75,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Only workshop can create service")
 
         service = serializer.save(workshop=user.workshopprofile)
-
+        print("Service created >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:", service)  # Debug log
         try:
             driver_profile = service.car.owner
             if not driver_profile:
