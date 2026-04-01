@@ -46,7 +46,14 @@ class WorkshopListView(ListAPIView):
     serializer_class = WorkshopProfileListSerializer
 
     def get_queryset(self):
-        queryset = WorkshopProfile.objects.all().prefetch_related('images')
+        queryset = WorkshopProfile.objects.all().prefetch_related('images').annotate(
+            total_customers=Count('service__car__owner', distinct=True),
+            average_rating=Coalesce(
+                Avg('ratings__rating'),
+                Value(0.0),
+                output_field=FloatField(),
+            ),
+        )
         title = self.request.query_params.get('title')
         if title:
             query = title.strip()

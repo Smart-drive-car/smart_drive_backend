@@ -44,10 +44,12 @@ class WorkshopProfileLoginSerializer(serializers.ModelSerializer):
 
 class WorkshopProfileListSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
+    total_customers = serializers.IntegerField(read_only=True)
+    rating = serializers.FloatField(source='average_rating', read_only=True)
 
     class Meta:
         model = WorkshopProfile
-        fields = ['id', 'title', 'address', 'description', 'working_time', 'latitude', 'longitude', 'images']
+        fields = ['id', 'title', 'address', 'description', 'working_time', 'latitude', 'longitude', 'images', 'total_customers', 'rating']
 
     def get_images(self, obj):
         try:
