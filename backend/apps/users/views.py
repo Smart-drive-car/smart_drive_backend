@@ -89,6 +89,7 @@ class SendOtpView(GenericAPIView):
                 is_login = False
 
             otp = send_sms(phone)
+            print(f"Generated OTP for >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> {phone}: {otp}")  # Debug log
 
             if otp:
                 OtpVerification.objects.update_or_create(
