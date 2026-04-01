@@ -56,9 +56,14 @@ def send_push_to_tokens(tokens, title, body, data=None):
                 ),
             ),
         )
-        return messaging.send_each_for_multicast(message, app=app)
-    except Exception:
-        logger.exception('Failed to send push notification via FCM.')
+        response = messaging.send_each_for_multicast(message, app=app)
+        logger.info(f"FCM Multicast response: {response.success_count} success, {response.failure_count} failures")
+        for i, res in enumerate(response.responses):
+            if not res.success:
+                logger.error(f"FCM error for token index {i}: {res.exception}")
+        return response
+    except Exception as e:
+        logger.error(f"Failed to send push notification via FCM: {repr(e)}")
         return None
 
 def send_notification_to_user(user, title, body, data=None):
@@ -80,6 +85,9 @@ def send_notification_to_user(user, title, body, data=None):
     ).values_list('token', flat=True)
 
     if tokens:
+        logger.info(f"Found {len(tokens)} tokens for user {user.id}. Sending push...")
         return send_push_to_tokens(tokens, title, body, data)
+    
+    logger.warning(f"No active tokens found for user {user.id}.")
     return None
 

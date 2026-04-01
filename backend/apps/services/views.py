@@ -75,7 +75,8 @@ class ServiceViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Only workshop can create service")
 
         service = serializer.save(workshop=user.workshopprofile)
-        print("Service created >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:", service)  # Debug log
+        logger.info(f"Service created: ID={service.id}, Car ID={service.car_id}")
+        
         try:
             driver_profile = service.car.owner
             if not driver_profile:
@@ -83,8 +84,10 @@ class ServiceViewSet(viewsets.ModelViewSet):
                 driver_profile = driver_car.driver_profile if driver_car else None
 
             if not driver_profile:
+                logger.warning(f"No driver profile found for car {service.car_id}. Skipping notification.")
                 return
 
+            logger.info(f"Preparing to send notification to User ID={driver_profile.user.id}")
             result = send_notification_to_user(
                 user=driver_profile.user,
                 title='New service created',
@@ -95,9 +98,9 @@ class ServiceViewSet(viewsets.ModelViewSet):
                     'car_id': str(service.car_id),
                 },
             )
-            print(f"Push notification result: {result}")
-        except Exception:
-            logger.exception('Failed to send service creation push notification.')
+            logger.info(f"Push notification send result for Service ID {service.id}: {result}")
+        except Exception as e:
+            logger.error(f"Failed to send service creation push notification: {repr(e)}")
 
     def perform_update(self, serializer):
         service = self.get_object()
