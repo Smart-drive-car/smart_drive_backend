@@ -1,6 +1,8 @@
 # apps/vehicles/serializers.py
 from rest_framework import serializers
 from .models import Car, DriverCar, VehicleModel, VehicleBrand
+from apps.services.models import Service
+from apps.services.models import Service
 
 class GPSPointSerializer(serializers.Serializer):
     lat = serializers.FloatField(min_value=-90, max_value=90)
@@ -54,9 +56,51 @@ class CarUpdateSerializer(serializers.ModelSerializer):
     released_year = serializers.IntegerField(required=False, min_value=1886)
     car_plate_number = serializers.CharField(max_length=20, required=False, allow_blank=False)
 
+    last_service = serializers.SerializerMethodField()
+    service_status = serializers.SerializerMethodField()
+
     class Meta:
         model = Car
-        fields = ['id', 'car_plate_number', 'released_year', 'current_mileage', 'vehicle_model_id', 'vehicle_model']
+        fields = ['id', 'car_plate_number', 'released_year', 'current_mileage', 'vehicle_model_id', 'vehicle_model', 'last_service', 'service_status']
+
+    def get_last_service(self, obj):
+        service = Service.objects.filter(car=obj, service_type__name__icontains="moy").order_by('-created_at').first()
+        if not service:
+            service = Service.objects.filter(car=obj, service_type__name__icontains="oil").order_by('-created_at').first()
+            if not service:
+                service = Service.objects.filter(car=obj).order_by('-created_at').first()
+        
+        if not service:
+            return None
+        return {
+            "id": service.id,
+            "workshop_name": service.workshop.title if service.workshop else "",
+            "service_type": service.service_type.name if service.service_type else "",
+            "interval": service.probeg,
+            "performed_at_mileage": service.performed_at_mileage
+        }
+
+    def get_service_status(self, obj):
+        service = Service.objects.filter(car=obj, service_type__name__icontains="moy").order_by('-created_at').first()
+        if not service:
+            service = Service.objects.filter(car=obj, service_type__name__icontains="oil").order_by('-created_at').first()
+            if not service:
+                service = Service.objects.filter(car=obj).order_by('-created_at').first()
+
+        if not service or service.performed_at_mileage is None or service.probeg is None:
+            return None
+
+        current = obj.current_mileage or 0
+        distance_traveled = current - service.performed_at_mileage
+        next_service_at = service.performed_at_mileage + service.probeg
+        remaining_distance = next_service_at - current
+
+        return {
+            "distance_traveled": max(0, distance_traveled),
+            "next_service_at": next_service_at,
+            "remaining_distance": abs(remaining_distance),
+            "is_overdue": remaining_distance < 0
+        }
 
     def validate_car_plate_number(self, value):
         if value:

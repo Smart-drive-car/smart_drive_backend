@@ -1,4 +1,4 @@
-from django.shortcuts import render
+﻿from django.shortcuts import render
 from .serializers import CarCreateSerializer, CarUpdateSerializer, VehicleBrandSerializer, VehicleModelSerializer,CarSearchSerializer
 from rest_framework import generics, serializers
 from rest_framework.permissions import IsAuthenticated
@@ -45,6 +45,19 @@ class VehicleRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         elif user.role in [Role.WORKSHOP, Role.ADMIN]:
             return Car.objects.all()
         return Car.objects.none()
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        old_mileage = instance.current_mileage or 0
+        updated_car = serializer.save()
+        
+        try:
+            if hasattr(updated_car, 'current_mileage') and updated_car.current_mileage != old_mileage:
+                from apps.vehicles.utils import check_and_send_service_warnings
+                check_and_send_service_warnings(updated_car, old_mileage)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Error checking notifications during manual mileage update: {e}")
 
 class VehicleBrandListView(generics.ListAPIView):
     queryset = VehicleBrand.objects.all()
@@ -115,13 +128,28 @@ class UpdateMileageView(APIView):
                 with transaction.atomic():
                     # select_for_update() prevents race conditions if multiple batches arrive fast
                     car = Car.objects.select_for_update().get(id=car_id, owner=request.user.driverprofile)
-                    
+
+                    old_mileage = car.current_mileage or 0
+                    old_mileage = car.current_mileage or 0
                     if not car.current_mileage:
                         car.current_mileage = 0
-                        
-                    # convert float distance to int (assuming current_mileage is stored as integer kilometers)
+
                     car.current_mileage += int(round(distance_travelled_km))
                     car.save()
+
+                    try:
+                        from apps.vehicles.utils import check_and_send_service_warnings
+                        check_and_send_service_warnings(car, old_mileage)
+                    except Exception as e:
+                        import logging
+                        logging.getLogger(__name__).error(f"Error checking notifications: {e}")
+
+                    try:
+                        from apps.vehicles.utils import check_and_send_service_warnings
+                        check_and_send_service_warnings(car, old_mileage)
+                    except Exception as e:
+                        import logging
+                        logging.getLogger(__name__).error(f"Error checking notifications: {e}")
                     
             except Car.DoesNotExist:
                 return Response({"error": "Car not found or you are not the owner."}, status=status.HTTP_404_NOT_FOUND)
@@ -134,3 +162,14 @@ class UpdateMileageView(APIView):
             }, status=status.HTTP_200_OK)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DriverCarListView(generics.ListAPIView):
+    serializer_class = CarUpdateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == Role.DRIVER:
+            return Car.objects.filter(owner=user.driverprofile).select_related('vehicle_model', 'vehicle_model__brand')
+        return Car.objects.none()

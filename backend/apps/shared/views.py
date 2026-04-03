@@ -17,8 +17,17 @@ class NotificationViewSet(
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Only return notifications for the authenticated user
-        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
+        qs = Notification.objects.filter(user=self.request.user).order_by('-created_at')
+        
+        if getattr(self, 'action', '') in ['list', 'mark_all_read']:
+            car_id = self.request.query_params.get('car_id')
+            # Require car_id optionally, or strictly? If strictly:
+            if not car_id:
+                from rest_framework.exceptions import ValidationError
+                raise ValidationError({"car_id": "car_id query parameter is required."})
+            qs = qs.filter(data__car_id=str(car_id))
+            
+        return qs
 
     @extend_schema(request=None)
     @action(detail=False, methods=['post'], url_path='mark-all-read')

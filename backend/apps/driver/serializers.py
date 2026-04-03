@@ -13,15 +13,36 @@ class DriverProfileLoginSerializer(serializers.ModelSerializer):
         fields = ['full_name', 'image', 'cars']
 
     def get_cars(self, obj):
+        from apps.services.models import Service
         car_links = DriverCar.objects.filter(driver_profile=obj).select_related('car', 'car__vehicle_model', 'car__vehicle_model__brand')
         from apps.vehicles.serializers import VehicleModelSerializer
-        return [{
-            "id": link.car.id,
-            "plate": link.car.car_plate_number,
-            "model_id": link.car.vehicle_model.id if link.car.vehicle_model else None,
-            "vehicle_model": VehicleModelSerializer(link.car.vehicle_model).data if link.car.vehicle_model else None,
-            "mileage": link.car.current_mileage
-        } for link in car_links]
+        
+        cars_data = []
+        for link in car_links:
+            car = link.car
+            service = Service.objects.filter(car=car, service_type__name__icontains="moy").order_by('-created_at').first()
+            if not service:
+                service = Service.objects.filter(car=car, service_type__name__icontains="oil").order_by('-created_at').first()
+                if not service:
+                    service = Service.objects.filter(car=car).order_by('-created_at').first()
+            
+            last_service = None
+            service_status = None
+
+            if service:
+                last_service = {"id": service.id, "workshop_name": service.workshop.title if service.workshop else "", "service_type": service.service_type.name if service.service_type else "", "interval": service.probeg, "performed_at_mileage": service.performed_at_mileage}
+                if service.performed_at_mileage is not None and service.probeg is not None:
+                    current = car.current_mileage or 0
+                    dist = current - service.performed_at_mileage
+                    nxt = service.performed_at_mileage + service.probeg
+                    rem = nxt - current
+                    service_status = {"distance_traveled": max(0, dist), "next_service_at": nxt, "remaining_distance": abs(rem), "is_overdue": rem < 0}
+
+            cars_data.append({
+                "id": car.id, "plate": car.car_plate_number, "model_id": car.vehicle_model.id if car.vehicle_model else None, "vehicle_model": VehicleModelSerializer(car.vehicle_model).data if car.vehicle_model else None, "mileage": car.current_mileage, "last_service": last_service, "service_status": service_status
+            })
+            
+        return cars_data
 
 
 class DriverProfileUpdateSerializer(serializers.ModelSerializer):

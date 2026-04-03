@@ -15,5 +15,11 @@ class ServiceAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
 
     def get_queryset(self, request):
+        return super().get_queryset(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def custom_get_queryset(self, request):
         user = request.user
         

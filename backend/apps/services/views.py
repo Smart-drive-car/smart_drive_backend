@@ -51,20 +51,35 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        car_id = self.request.query_params.get('car_id')
+
+        if getattr(self, 'action', '') == 'list' and user.role == 'DRIVER':
+            if not car_id:
+                from rest_framework.exceptions import ValidationError
+                raise ValidationError({"car_id": "car_id query parameter is required to fetch services."})
 
         # 🛠 Workshop → faqat o'z service
         if user.role == 'WORKSHOP':
-            return Service.objects.filter(workshop=user.workshopprofile)
+            qs = Service.objects.filter(workshop=user.workshopprofile)
+            if getattr(self, 'action', '') == 'list' and car_id:
+                qs = qs.filter(car_id=car_id)
+            return qs
 
         # 🚗 Driver → faqat o'z mashinalariga tegishli service
         if user.role == 'DRIVER':
-            return Service.objects.filter(
+            qs = Service.objects.filter(
                 car__drivercar__driver_profile=user.driverprofile
             )
+            if getattr(self, 'action', '') == 'list' and car_id:
+                qs = qs.filter(car_id=car_id)
+            return qs
 
         # 👑 Admin → hammasi
         if user.role == 'ADMIN':
-            return Service.objects.all()
+            qs = Service.objects.all()
+            if getattr(self, 'action', '') == 'list' and car_id:
+                qs = qs.filter(car_id=car_id)
+            return qs
 
         return Service.objects.none()
 
@@ -112,11 +127,5 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
         serializer.save()
 
-    def perform_destroy(self, instance):
-        user = self.request.user
-
-        if user.role == 'WORKSHOP':
-            if instance.workshop != user.workshopprofile:
-                raise PermissionDenied("You can delete only your services")
-
-        instance.delete()
+    def destroy(self, request, *args, **kwargs):
+        raise PermissionDenied("Deleting a service is permanently disabled to maintain accurate vehicle service history.")
