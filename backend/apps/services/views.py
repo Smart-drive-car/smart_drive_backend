@@ -83,14 +83,21 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
         return Service.objects.none()
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
+        from rest_framework import status
+        from rest_framework.response import Response
+        
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
         user = self.request.user
-
         if user.role != 'WORKSHOP':
             raise PermissionDenied("Only workshop can create service")
 
         service = serializer.save(workshop=user.workshopprofile)
         logger.info(f"Service created: ID={service.id}, Car ID={service.car_id}")
+        
+        notification_result = None
         
         try:
             driver_profile = service.car.owner
@@ -100,22 +107,38 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
             if not driver_profile:
                 logger.warning(f"No driver profile found for car {service.car_id}. Skipping notification.")
-                return
-
-            logger.info(f"Preparing to send notification to User ID={driver_profile.user.id}")
-            result = send_notification_to_user(
-                user=driver_profile.user,
-                title='New service created',
-                body=f"{service.service_type.name} service was created by {service.workshop.title}.",
-                data={
+            else:
+                logger.info(f"Preparing to send notification to User ID={driver_profile.user.id}")
+                
+                notification_data = {
                     'event': 'service_created',
                     'service_id': str(service.id),
                     'car_id': str(service.car_id),
-                },
-            )
-            logger.info(f"Push notification send result for Service ID {service.id}: {result}")
+                }
+                
+                first_image = service.workshop.images.first()
+                if first_image and first_image.image:
+                    try:
+                        notification_data['image'] = self.request.build_absolute_uri(first_image.image.url)
+                    except Exception as img_e:
+                        logger.warning(f"Failed to get image url: {img_e}")
+                        
+                notification_result = send_notification_to_user(
+                    user=driver_profile.user,
+                    title='New service created',
+                    body=f"{service.service_type.name} service was created by {service.workshop.title}.",
+                    data=notification_data,
+                )
+                logger.info(f"Push notification send result for Service ID {service.id}: {notification_result}")
         except Exception as e:
             logger.error(f"Failed to send service creation push notification: {repr(e)}")
+
+        headers = self.get_success_headers(serializer.data)
+        response_data = serializer.data
+        if notification_result:
+            response_data["notification_result"] = notification_result
+            
+        return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_update(self, serializer):
         service = self.get_object()

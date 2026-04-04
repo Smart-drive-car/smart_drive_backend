@@ -68,11 +68,18 @@ def calculate_total_distance(points):
 from apps.services.models import Service
 from apps.shared.models import Notification
 from apps.shared.push_notifications import send_notification_to_user
+import logging
+
+logger = logging.getLogger(__name__)
 
 def check_and_send_service_warnings(car, old_mileage):
+    logger.info(f"Inside check_and_send_service_warnings! Old: {old_mileage}, New: {car.current_mileage}")
     if car.current_mileage == old_mileage:
+        logger.info(f"Car {car.id}: Mileage did not change. Skipping warnings.")
         return
     
+    logger.info(f"Checking service warnings for Car {car.id} (Plate: {car.car_plate_number}). Old mileage: {old_mileage}, New mileage: {car.current_mileage}")
+
     service = Service.objects.filter(car=car, service_type__name__icontains="moy").order_by("-created_at").first()
     if not service:
         service = Service.objects.filter(car=car, service_type__name__icontains="oil").order_by("-created_at").first()
@@ -80,19 +87,24 @@ def check_and_send_service_warnings(car, old_mileage):
              service = Service.objects.filter(car=car).order_by("-created_at").first()
 
     if not service or service.performed_at_mileage is None or service.probeg is None:
+        logger.debug(f"Car {car.id}: No valid service found with mileage and probeg. Skipping warnings.")
         return
         
     next_service_at = service.performed_at_mileage + service.probeg
     old_remaining = next_service_at - old_mileage
     new_remaining = next_service_at - car.current_mileage
     
+    logger.info(f"Car {car.id}: Service {service.id}. Old remaining: {old_remaining}, New remaining: {new_remaining}")
+
     driver_user = car.owner.user if car.owner else None
     if not driver_user:
+        logger.debug(f"Car {car.id}: No driver associated. Skipping notification.")
         return
 
     if old_remaining > 1000 and new_remaining <= 1000 and new_remaining > 0:
         event = "warning_1000km"
         if not Notification.objects.filter(user=driver_user, data__service_id=str(service.id), data__event=event).exists():
+            logger.info(f"Car {car.id}: Triggering 1000km warning notification for User {driver_user.id}.")
             title_text = f"{int(car.current_mileage):,}km".replace(",", " ")
             body_text = f"{int(new_remaining):,}km dan so'ng moy almashtirishingiz kerak".replace(",", " ")
             send_notification_to_user(
@@ -101,10 +113,13 @@ def check_and_send_service_warnings(car, old_mileage):
                 body=body_text,
                 data={"event": event, "service_id": str(service.id), "car_id": str(car.id)}
             )
+        else:
+            logger.debug(f"Car {car.id}: 1000km warning already sent for service {service.id}. Skipping.")
             
     if old_remaining >= 0 and new_remaining < 0:
         event = "warning_overdue"
         if not Notification.objects.filter(user=driver_user, data__service_id=str(service.id), data__event=event).exists():
+            logger.info(f"Car {car.id}: Triggering overdue warning notification for User {driver_user.id}.")
             title_text = f"{int(car.current_mileage):,}km".replace(",", " ")
             body_text = f"Mashina probeg-ingiz taxminan: {int(car.current_mileage):,} km Agar mashina probeg-dan katta farq qilsa mashina probeg-ini kirgizishingizni so'raymiz!".replace(",", " ")
             send_notification_to_user(
@@ -113,3 +128,5 @@ def check_and_send_service_warnings(car, old_mileage):
                 body=body_text,
                 data={"event": event, "service_id": str(service.id), "car_id": str(car.id)}
             )
+        else:
+            logger.debug(f"Car {car.id}: Overdue warning already sent for service {service.id}. Skipping.")

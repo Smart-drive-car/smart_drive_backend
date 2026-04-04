@@ -58,10 +58,23 @@ def send_push_to_tokens(tokens, title, body, data=None):
         )
         response = messaging.send_each_for_multicast(message, app=app)
         logger.info(f"FCM Multicast response: {response.success_count} success, {response.failure_count} failures")
+        
+        token_results = []
         for i, res in enumerate(response.responses):
+            token_results.append({
+                "token": list(tokens)[i],
+                "success": res.success,
+                "message_id": res.message_id,
+                "error": str(res.exception) if res.exception else None
+            })
             if not res.success:
                 logger.error(f"FCM error for token index {i}: {res.exception}")
-        return response
+                
+        return {
+            "success_count": response.success_count,
+            "failure_count": response.failure_count,
+            "results": token_results
+        }
     except Exception as e:
         logger.error(f"Failed to send push notification via FCM: {repr(e)}")
         return None
@@ -71,12 +84,13 @@ def send_notification_to_user(user, title, body, data=None):
     from apps.users.models import UserDeviceToken
 
     # Create the notification in DB
-    Notification.objects.create(
+    notification = Notification.objects.create(
         user=user,
         title=title,
         body=body,
         data=data or {}
     )
+    logger.info(f"Saved DB Notification (ID: {notification.id}) for User {user.id}. Title: '{title}', Event: {data.get('event', 'unknown') if data else 'unknown'}")
 
     # Get active device tokens
     tokens = UserDeviceToken.objects.filter(
