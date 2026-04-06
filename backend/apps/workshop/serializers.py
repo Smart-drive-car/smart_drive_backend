@@ -30,16 +30,30 @@ def validate_working_time_format(value):
 
 class WorkshopProfileLoginSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
+    total_customers = serializers.SerializerMethodField()
+    total_cars = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkshopProfile
-        fields = ['title', 'address', 'description', 'working_time', 'latitude', 'longitude', 'images']
+        fields = ['title', 'address', 'description', 'working_time', 'latitude', 'longitude', 'images', 'total_customers', 'total_cars']
 
     def get_images(self, obj):
         try:
             return [{'id': img.id, 'image': img.image.url} for img in obj.images.all()]
         except Exception:
             return []
+
+    def get_total_customers(self, obj):
+        try:
+            return obj.service_set.values('car__owner').distinct().count()
+        except Exception:
+            return 0
+
+    def get_total_cars(self, obj):
+        try:
+            return obj.service_set.values('car').distinct().count()
+        except Exception:
+            return 0
 
 
 class WorkshopProfileListSerializer(serializers.ModelSerializer):
