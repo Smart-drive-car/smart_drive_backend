@@ -123,9 +123,12 @@ class ServiceViewSet(viewsets.ModelViewSet):
                     except Exception as img_e:
                         logger.warning(f"Failed to get image url: {img_e}")
                         
+                # Set title to service description if available, otherwise workshop name
+                title_text = service.description if service.description else service.workshop.title
+
                 notification_result = send_notification_to_user(
                     user=driver_profile.user,
-                    title='New service created',
+                    title=title_text,
                     body=f"{service.service_type.name} service was created by {service.workshop.title}.",
                     data=notification_data,
                 )
