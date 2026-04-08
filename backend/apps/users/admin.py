@@ -2,17 +2,15 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from .models import User, AdminProfile, OtpVerification
+from .models import User, AdminProfile, OtpVerification, UserPasswordReset, UserDeviceToken
 
 # 1. THE CREATION FORM
 class MyUserCreationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     password_confirm = forms.CharField(label='Confirm Password', widget=forms.PasswordInput)
-
     class Meta:
         model = User
-        fields = ('phone_number','role') # ONLY use fields that actually exist in your model
-
+        fields = ('phone_number','role')
     def clean_password_confirm(self):
         p1 = self.cleaned_data.get("password")
         p2 = self.cleaned_data.get("password_confirm")
@@ -41,21 +39,17 @@ class UserAdmin(BaseUserAdmin):
     form = MyUserChangeForm
     add_form = MyUserCreationForm
 
-    # Which columns show up in the table view
-    list_display = ('phone_number', 'is_staff',)
-    list_filter = ('is_staff',)
+    list_display = ('phone_number', 'role', 'is_staff',)
+    list_filter = ('role', 'is_staff',)
     
-    # Crucial: Override ordering to use phone_number
     ordering = ('phone_number',)
     search_fields = ('phone_number',)
 
-    # The layout for the EDIT page
     fieldsets = (
         (None, {'fields': ('phone_number','role', 'password')}),
         ('Permissions', {'fields': ('is_staff', 'is_superuser')}),
     )
 
-    # The layout for the ADD page
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
@@ -75,3 +69,14 @@ class AdminProfileAdmin(admin.ModelAdmin):
 class OtpVerificationAdmin(admin.ModelAdmin):
     list_display = ('phone_number', 'code', 'is_used', 'expires_at', 'created_at')
     search_fields = ('phone_number',)
+
+@admin.register(UserPasswordReset)
+class UserPasswordResetAdmin(admin.ModelAdmin):
+    list_display = ('user', 'reset_token', 'created_at')
+    search_fields = ('user__phone_number',)
+
+@admin.register(UserDeviceToken)
+class UserDeviceTokenAdmin(admin.ModelAdmin):
+    list_display = ('user', 'token', 'platform', 'is_active', 'created_at')
+    search_fields = ('user__phone_number', 'token')
+    list_filter = ('platform', 'is_active')

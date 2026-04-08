@@ -90,7 +90,7 @@ def check_and_send_service_warnings(car, old_mileage):
         logger.debug(f"Car {car.id}: No valid service found with mileage and probeg. Skipping warnings.")
         return
         
-    next_service_at = service.probeg
+    next_service_at = service.performed_at_mileage + service.probeg
     old_remaining = next_service_at - old_mileage
     new_remaining = next_service_at - car.current_mileage
     

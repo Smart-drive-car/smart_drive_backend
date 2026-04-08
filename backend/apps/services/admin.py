@@ -6,12 +6,12 @@ from .models import Service, ServiceType
 class ServiceTypeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'created_at', 'updated_at')
     search_fields = ('name',)
-    ordering = ('-created_at',) 
+    ordering = ('-created_at',)
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
     list_display = ('id', 'service_type', 'workshop', 'car', 'created_at', 'updated_at')
-    search_fields = ('service_type__name', 'workshop__title', 'car__license_plate')
+    search_fields = ('service_type__name', 'workshop__title', 'car__car_plate_number')
     ordering = ('-created_at',)
 
     def get_queryset(self, request):
@@ -19,7 +19,3 @@ class ServiceAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
-
-    def custom_get_queryset(self, request):
-        user = request.user
-        

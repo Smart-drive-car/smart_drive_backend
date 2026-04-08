@@ -3,10 +3,15 @@ from django.contrib import admin
 from .models import WorkshopProfile, WorkshopProfileImages, WorkshopRating
 
 
+class WorkshopProfileImagesInline(admin.TabularInline):
+    model = WorkshopProfileImages
+    extra = 1
+
 @admin.register(WorkshopProfile)
 class WorkshopProfileAdmin(admin.ModelAdmin):
     list_display = ('title', 'working_time', 'description', 'user', 'created_at')
     search_fields = ('title', 'description', 'user__phone_number')
+    inlines = [WorkshopProfileImagesInline]
 
 
 @admin.register(WorkshopProfileImages)
