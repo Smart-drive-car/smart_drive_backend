@@ -16,6 +16,3 @@ class ServiceAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request)
-
-    def has_delete_permission(self, request, obj=None):
-        return False
