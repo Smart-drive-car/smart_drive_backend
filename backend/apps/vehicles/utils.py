@@ -58,7 +58,7 @@ def calculate_total_distance(points):
             speed_kmh = dist_km / time_diff_hours
             
             # Only accumulate mileage if the calculated speed is between 15 km/h and 160 km/h
-            if 15 <= speed_kmh <= 160:
+            if 10 <= speed_kmh <= 190:
                 total_km += dist_km
         
     return total_km
@@ -121,7 +121,7 @@ def check_and_send_service_warnings(car, old_mileage):
         if not Notification.objects.filter(user=driver_user, data__service_id=str(service.id), data__event=event).exists():
             logger.info(f"Car {car.id}: Triggering overdue warning notification for User {driver_user.id}.")
             title_text = f"{int(car.current_mileage):,}km".replace(",", " ")
-            body_text = f"Mashina probeg-ingiz taxminan: {int(car.current_mileage):,} km Agar mashina probeg-dan katta farq qilsa mashina probeg-ini kirgizishingizni so'raymiz!".replace(",", " ")
+            body_text = f"Mashinaning umumiy yurgan masofasi taxminan: {int(car.current_mileage):,} km Agar bu haqiqiy yurgan masofadan farq qilsa, iltimos, to'g'ri qiymatni kiriting!".replace(",", " ")
             send_notification_to_user(
                 user=driver_user,
                 title=title_text,

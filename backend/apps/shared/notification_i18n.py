@@ -83,8 +83,8 @@ def localize_notification(title, body, data=None):
 
         if current_mileage:
             body_uz = (
-                f"Mashina probeg-ingiz taxminan: {_fmt_km(current_mileage)} km "
-                "Agar mashina probeg-dan katta farq qilsa mashina probeg-ini kirgizishingizni so'raymiz!"
+                f"Mashinaning umumiy yurgan masofasi taxminan: {_fmt_km(current_mileage)} km "
+                "Agar bu haqiqiy yurgan masofadan farq qilsa, iltimos, to'g'ri qiymatni kiriting!"
             )
             body_ru = (
                 f"Текущий пробег автомобиля примерно: {_fmt_km(current_mileage)} км. "
