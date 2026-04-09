@@ -1,0 +1,2207 @@
+[
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 1,
+    "fields": {
+      "name": "Chevrolet",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 1,
+    "fields": {
+      "brand": 1,
+      "model_name": "Cobalt",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 2,
+    "fields": {
+      "brand": 1,
+      "model_name": "Damas",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 3,
+    "fields": {
+      "brand": 1,
+      "model_name": "Labo",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 4,
+    "fields": {
+      "brand": 1,
+      "model_name": "Onix",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 5,
+    "fields": {
+      "brand": 1,
+      "model_name": "Tracker",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 6,
+    "fields": {
+      "brand": 1,
+      "model_name": "Gentra (Lacetti)",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 7,
+    "fields": {
+      "brand": 1,
+      "model_name": "Malibu",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 8,
+    "fields": {
+      "brand": 1,
+      "model_name": "Equinox",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 9,
+    "fields": {
+      "brand": 1,
+      "model_name": "Traverse",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 10,
+    "fields": {
+      "brand": 1,
+      "model_name": "Tahoe",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 11,
+    "fields": {
+      "brand": 1,
+      "model_name": "Orlando",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 12,
+    "fields": {
+      "brand": 1,
+      "model_name": "Epica",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 13,
+    "fields": {
+      "brand": 1,
+      "model_name": "Captiva",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 14,
+    "fields": {
+      "brand": 1,
+      "model_name": "Aveo",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 15,
+    "fields": {
+      "brand": 1,
+      "model_name": "Monza",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 16,
+    "fields": {
+      "brand": 1,
+      "model_name": "Cavalier",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 17,
+    "fields": {
+      "brand": 1,
+      "model_name": "Spark",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 18,
+    "fields": {
+      "brand": 1,
+      "model_name": "Trailblazer",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 19,
+    "fields": {
+      "brand": 1,
+      "model_name": "Cruze",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 2,
+    "fields": {
+      "name": "Daewoo",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 20,
+    "fields": {
+      "brand": 2,
+      "model_name": "Tico",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 21,
+    "fields": {
+      "brand": 2,
+      "model_name": "Matiz",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 22,
+    "fields": {
+      "brand": 2,
+      "model_name": "Nexia",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 23,
+    "fields": {
+      "brand": 2,
+      "model_name": "Espero",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 24,
+    "fields": {
+      "brand": 2,
+      "model_name": "Prince",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 25,
+    "fields": {
+      "brand": 2,
+      "model_name": "Cielo",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 26,
+    "fields": {
+      "brand": 2,
+      "model_name": "Leganza",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 27,
+    "fields": {
+      "brand": 2,
+      "model_name": "Magnus",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 28,
+    "fields": {
+      "brand": 2,
+      "model_name": "Tacuma",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 3,
+    "fields": {
+      "name": "BYD",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 29,
+    "fields": {
+      "brand": 3,
+      "model_name": "Chazor",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 30,
+    "fields": {
+      "brand": 3,
+      "model_name": "Song",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 31,
+    "fields": {
+      "brand": 3,
+      "model_name": "Han",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 32,
+    "fields": {
+      "brand": 3,
+      "model_name": "Tang",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 33,
+    "fields": {
+      "brand": 3,
+      "model_name": "Qin",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 34,
+    "fields": {
+      "brand": 3,
+      "model_name": "Seagull",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 35,
+    "fields": {
+      "brand": 3,
+      "model_name": "Dolphin",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 36,
+    "fields": {
+      "brand": 3,
+      "model_name": "Yuan",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 37,
+    "fields": {
+      "brand": 3,
+      "model_name": "Seal",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 38,
+    "fields": {
+      "brand": 3,
+      "model_name": "Sealion",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 39,
+    "fields": {
+      "brand": 3,
+      "model_name": "Frigate",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 40,
+    "fields": {
+      "brand": 3,
+      "model_name": "E2",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 4,
+    "fields": {
+      "name": "Kia",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 41,
+    "fields": {
+      "brand": 4,
+      "model_name": "Sonet",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 42,
+    "fields": {
+      "brand": 4,
+      "model_name": "Seltos",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 43,
+    "fields": {
+      "brand": 4,
+      "model_name": "Sportage",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 44,
+    "fields": {
+      "brand": 4,
+      "model_name": "Sorento",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 45,
+    "fields": {
+      "brand": 4,
+      "model_name": "Carnival",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 46,
+    "fields": {
+      "brand": 4,
+      "model_name": "K5",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 47,
+    "fields": {
+      "brand": 4,
+      "model_name": "K8",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 48,
+    "fields": {
+      "brand": 4,
+      "model_name": "K9",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 49,
+    "fields": {
+      "brand": 4,
+      "model_name": "Carens",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 50,
+    "fields": {
+      "brand": 4,
+      "model_name": "Bongo",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 51,
+    "fields": {
+      "brand": 4,
+      "model_name": "EV6",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 52,
+    "fields": {
+      "brand": 4,
+      "model_name": "EV9",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 53,
+    "fields": {
+      "brand": 4,
+      "model_name": "Cerato",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 54,
+    "fields": {
+      "brand": 4,
+      "model_name": "Rio",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 55,
+    "fields": {
+      "brand": 4,
+      "model_name": "Picanto",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 56,
+    "fields": {
+      "brand": 4,
+      "model_name": "Stinger",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 57,
+    "fields": {
+      "brand": 4,
+      "model_name": "Telluride",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 5,
+    "fields": {
+      "name": "Lada",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 58,
+    "fields": {
+      "brand": 5,
+      "model_name": "Vesta",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 59,
+    "fields": {
+      "brand": 5,
+      "model_name": "Granta",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 60,
+    "fields": {
+      "brand": 5,
+      "model_name": "Largus",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 61,
+    "fields": {
+      "brand": 5,
+      "model_name": "X-Ray",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 62,
+    "fields": {
+      "brand": 5,
+      "model_name": "Niva",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 63,
+    "fields": {
+      "brand": 5,
+      "model_name": "Priora",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 64,
+    "fields": {
+      "brand": 5,
+      "model_name": "Kalina",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 6,
+    "fields": {
+      "name": "VAZ (Soviet Classics)",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 65,
+    "fields": {
+      "brand": 6,
+      "model_name": "2101",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 66,
+    "fields": {
+      "brand": 6,
+      "model_name": "2102",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 67,
+    "fields": {
+      "brand": 6,
+      "model_name": "2103",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 68,
+    "fields": {
+      "brand": 6,
+      "model_name": "2104",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 69,
+    "fields": {
+      "brand": 6,
+      "model_name": "2105",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 70,
+    "fields": {
+      "brand": 6,
+      "model_name": "2106",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 71,
+    "fields": {
+      "brand": 6,
+      "model_name": "2107",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 72,
+    "fields": {
+      "brand": 6,
+      "model_name": "2108",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 73,
+    "fields": {
+      "brand": 6,
+      "model_name": "2109",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 74,
+    "fields": {
+      "brand": 6,
+      "model_name": "21099",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 75,
+    "fields": {
+      "brand": 6,
+      "model_name": "2110",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 76,
+    "fields": {
+      "brand": 6,
+      "model_name": "2111",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 77,
+    "fields": {
+      "brand": 6,
+      "model_name": "2112",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 78,
+    "fields": {
+      "brand": 6,
+      "model_name": "2114",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 79,
+    "fields": {
+      "brand": 6,
+      "model_name": "2115",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 7,
+    "fields": {
+      "name": "Chery",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 80,
+    "fields": {
+      "brand": 7,
+      "model_name": "Tiggo 2",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 81,
+    "fields": {
+      "brand": 7,
+      "model_name": "Tiggo 4",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 82,
+    "fields": {
+      "brand": 7,
+      "model_name": "Tiggo 7",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 83,
+    "fields": {
+      "brand": 7,
+      "model_name": "Tiggo 8",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 84,
+    "fields": {
+      "brand": 7,
+      "model_name": "Arrizo 6",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 85,
+    "fields": {
+      "brand": 7,
+      "model_name": "Arrizo 8",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 86,
+    "fields": {
+      "brand": 7,
+      "model_name": "Omoda",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 8,
+    "fields": {
+      "name": "Jetour",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 87,
+    "fields": {
+      "brand": 8,
+      "model_name": "Dashing",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 88,
+    "fields": {
+      "brand": 8,
+      "model_name": "Traveler",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 89,
+    "fields": {
+      "brand": 8,
+      "model_name": "X70",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 90,
+    "fields": {
+      "brand": 8,
+      "model_name": "X90",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 91,
+    "fields": {
+      "brand": 8,
+      "model_name": "X50",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 9,
+    "fields": {
+      "name": "Haval",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 92,
+    "fields": {
+      "brand": 9,
+      "model_name": "Jolion",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 93,
+    "fields": {
+      "brand": 9,
+      "model_name": "M6",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 94,
+    "fields": {
+      "brand": 9,
+      "model_name": "H6",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 95,
+    "fields": {
+      "brand": 9,
+      "model_name": "H9",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 96,
+    "fields": {
+      "brand": 9,
+      "model_name": "Dargo",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 10,
+    "fields": {
+      "name": "Hyundai",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 97,
+    "fields": {
+      "brand": 10,
+      "model_name": "Accent",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 98,
+    "fields": {
+      "brand": 10,
+      "model_name": "Elantra",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 99,
+    "fields": {
+      "brand": 10,
+      "model_name": "Sonata",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 100,
+    "fields": {
+      "brand": 10,
+      "model_name": "Tucson",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 101,
+    "fields": {
+      "brand": 10,
+      "model_name": "Santa Fe",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 102,
+    "fields": {
+      "brand": 10,
+      "model_name": "Palisade",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 103,
+    "fields": {
+      "brand": 10,
+      "model_name": "Staria",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 104,
+    "fields": {
+      "brand": 10,
+      "model_name": "Creta",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 105,
+    "fields": {
+      "brand": 10,
+      "model_name": "Kona",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 11,
+    "fields": {
+      "name": "Toyota",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 106,
+    "fields": {
+      "brand": 11,
+      "model_name": "Camry",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 107,
+    "fields": {
+      "brand": 11,
+      "model_name": "Land Cruiser",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 108,
+    "fields": {
+      "brand": 11,
+      "model_name": "Prado",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 109,
+    "fields": {
+      "brand": 11,
+      "model_name": "Corolla",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 110,
+    "fields": {
+      "brand": 11,
+      "model_name": "RAV4",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 111,
+    "fields": {
+      "brand": 11,
+      "model_name": "Hilux",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 112,
+    "fields": {
+      "brand": 11,
+      "model_name": "Avalon",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 113,
+    "fields": {
+      "brand": 11,
+      "model_name": "Fortuner",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 114,
+    "fields": {
+      "brand": 11,
+      "model_name": "Alphard",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 115,
+    "fields": {
+      "brand": 11,
+      "model_name": "Hiace",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 12,
+    "fields": {
+      "name": "Zeekr",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 116,
+    "fields": {
+      "brand": 12,
+      "model_name": "001",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 117,
+    "fields": {
+      "brand": 12,
+      "model_name": "007",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 118,
+    "fields": {
+      "brand": 12,
+      "model_name": "009",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 119,
+    "fields": {
+      "brand": 12,
+      "model_name": "X",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 120,
+    "fields": {
+      "brand": 12,
+      "model_name": "7X",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 13,
+    "fields": {
+      "name": "Li Auto (Lixiang)",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 121,
+    "fields": {
+      "brand": 13,
+      "model_name": "L6",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 122,
+    "fields": {
+      "brand": 13,
+      "model_name": "L7",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 123,
+    "fields": {
+      "brand": 13,
+      "model_name": "L8",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 124,
+    "fields": {
+      "brand": 13,
+      "model_name": "L9",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 14,
+    "fields": {
+      "name": "NIO",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 125,
+    "fields": {
+      "brand": 14,
+      "model_name": "EL8",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 126,
+    "fields": {
+      "brand": 14,
+      "model_name": "EL6",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 127,
+    "fields": {
+      "brand": 14,
+      "model_name": "ET5",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 128,
+    "fields": {
+      "brand": 14,
+      "model_name": "ET7",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 129,
+    "fields": {
+      "brand": 14,
+      "model_name": "ET9",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 130,
+    "fields": {
+      "brand": 14,
+      "model_name": "EC6",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 131,
+    "fields": {
+      "brand": 14,
+      "model_name": "EC7",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 132,
+    "fields": {
+      "brand": 14,
+      "model_name": "ES6",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 133,
+    "fields": {
+      "brand": 14,
+      "model_name": "ES7",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 134,
+    "fields": {
+      "brand": 14,
+      "model_name": "ES8",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 15,
+    "fields": {
+      "name": "Leapmotor",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 135,
+    "fields": {
+      "brand": 15,
+      "model_name": "T03",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 136,
+    "fields": {
+      "brand": 15,
+      "model_name": "C10",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 137,
+    "fields": {
+      "brand": 15,
+      "model_name": "C11",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 138,
+    "fields": {
+      "brand": 15,
+      "model_name": "B10",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 16,
+    "fields": {
+      "name": "Tank",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 139,
+    "fields": {
+      "brand": 16,
+      "model_name": "300",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 140,
+    "fields": {
+      "brand": 16,
+      "model_name": "400",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 141,
+    "fields": {
+      "brand": 16,
+      "model_name": "500",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 17,
+    "fields": {
+      "name": "Geely",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 142,
+    "fields": {
+      "brand": 17,
+      "model_name": "Monjaro",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 143,
+    "fields": {
+      "brand": 17,
+      "model_name": "Coolray",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 144,
+    "fields": {
+      "brand": 17,
+      "model_name": "Tugella",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 145,
+    "fields": {
+      "brand": 17,
+      "model_name": "Geometry",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 146,
+    "fields": {
+      "brand": 17,
+      "model_name": "Emgrand",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 18,
+    "fields": {
+      "name": "Exeed",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 147,
+    "fields": {
+      "brand": 18,
+      "model_name": "LX",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 148,
+    "fields": {
+      "brand": 18,
+      "model_name": "TXL",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 149,
+    "fields": {
+      "brand": 18,
+      "model_name": "VX",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 150,
+    "fields": {
+      "brand": 18,
+      "model_name": "RX",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 19,
+    "fields": {
+      "name": "GAZ",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 151,
+    "fields": {
+      "brand": 19,
+      "model_name": "Volga",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 152,
+    "fields": {
+      "brand": 19,
+      "model_name": "GAZelle",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 153,
+    "fields": {
+      "brand": 19,
+      "model_name": "GAZ-69",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 20,
+    "fields": {
+      "name": "UAZ",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 154,
+    "fields": {
+      "brand": 20,
+      "model_name": "Hunter",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 155,
+    "fields": {
+      "brand": 20,
+      "model_name": "Patriot",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 156,
+    "fields": {
+      "brand": 20,
+      "model_name": "Bukhanka",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 157,
+    "fields": {
+      "brand": 20,
+      "model_name": "469",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 21,
+    "fields": {
+      "name": "Moskvich",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 158,
+    "fields": {
+      "brand": 21,
+      "model_name": "412",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 159,
+    "fields": {
+      "brand": 21,
+      "model_name": "2140",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 160,
+    "fields": {
+      "brand": 21,
+      "model_name": "2141",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 161,
+    "fields": {
+      "brand": 21,
+      "model_name": "3",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 22,
+    "fields": {
+      "name": "Mercedes-Benz",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 162,
+    "fields": {
+      "brand": 22,
+      "model_name": "E-Class",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 163,
+    "fields": {
+      "brand": 22,
+      "model_name": "S-Class",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 164,
+    "fields": {
+      "brand": 22,
+      "model_name": "G-Class",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 165,
+    "fields": {
+      "brand": 22,
+      "model_name": "GLS",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 166,
+    "fields": {
+      "brand": 22,
+      "model_name": "Sprinter",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 167,
+    "fields": {
+      "brand": 22,
+      "model_name": "V-Class",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 23,
+    "fields": {
+      "name": "BMW",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 168,
+    "fields": {
+      "brand": 23,
+      "model_name": "3-Series",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 169,
+    "fields": {
+      "brand": 23,
+      "model_name": "5-Series",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 170,
+    "fields": {
+      "brand": 23,
+      "model_name": "7-Series",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 171,
+    "fields": {
+      "brand": 23,
+      "model_name": "X5",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 172,
+    "fields": {
+      "brand": 23,
+      "model_name": "X6",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 173,
+    "fields": {
+      "brand": 23,
+      "model_name": "X7",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 24,
+    "fields": {
+      "name": "Volkswagen",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 174,
+    "fields": {
+      "brand": 24,
+      "model_name": "ID.3",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 175,
+    "fields": {
+      "brand": 24,
+      "model_name": "ID.4",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 176,
+    "fields": {
+      "brand": 24,
+      "model_name": "ID.6",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 177,
+    "fields": {
+      "brand": 24,
+      "model_name": "Teramont",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 178,
+    "fields": {
+      "brand": 24,
+      "model_name": "Passat",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 179,
+    "fields": {
+      "brand": 24,
+      "model_name": "Touareg",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclebrand",
+    "pk": 25,
+    "fields": {
+      "name": "Others",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  },
+  {
+    "model": "vehicles.vehiclemodel",
+    "pk": 180,
+    "fields": {
+      "brand": 25,
+      "model_name": "Others",
+      "image": "",
+      "created_at": "2026-04-09T20:51:34.060796Z",
+      "updated_at": "2026-04-09T20:51:34.060796Z"
+    }
+  }
+]
