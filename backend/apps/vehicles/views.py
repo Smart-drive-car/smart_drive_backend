@@ -130,11 +130,10 @@ class UpdateMileageView(APIView):
                     car = Car.objects.select_for_update().get(id=car_id, owner=request.user.driverprofile)
 
                     old_mileage = car.current_mileage or 0
-                    old_mileage = car.current_mileage or 0
                     if not car.current_mileage:
                         car.current_mileage = 0
 
-                    car.current_mileage += int(round(distance_travelled_km))
+                    car.current_mileage += distance_travelled_km
                     car.save()
 
                     try:
