@@ -133,7 +133,7 @@ class UpdateMileageView(APIView):
                     if not car.current_mileage:
                         car.current_mileage = 0
 
-                    car.current_mileage += distance_travelled_km
+                    car.current_mileage += round(distance_travelled_km, 3)
                     car.save()
 
                     try:
