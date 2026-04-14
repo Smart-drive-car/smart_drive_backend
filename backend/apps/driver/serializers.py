@@ -39,7 +39,7 @@ class DriverProfileLoginSerializer(serializers.ModelSerializer):
                     service_status = {"distance_traveled": max(0, dist), "next_service_at": nxt, "remaining_distance": abs(rem), "is_overdue": rem < 0}
 
             cars_data.append({
-                "id": car.id, "plate": car.car_plate_number, "model_id": car.vehicle_model.id if car.vehicle_model else None, "vehicle_model": VehicleModelSerializer(car.vehicle_model).data if car.vehicle_model else None, "mileage": car.current_mileage, "last_service": last_service, "service_status": service_status
+                "id": car.id, "plate": car.car_plate_number, "model_id": car.vehicle_model.id if car.vehicle_model else None, "vehicle_model": VehicleModelSerializer(car.vehicle_model).data if car.vehicle_model else None, "mileage": car.current_mileage, "released_year": car.released_year, "last_service": last_service, "service_status": service_status
             })
             
         return cars_data

@@ -30,6 +30,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://smart-drive.uz",
     "https://www.smart-drive.uz",
     "http://localhost:5173",
+    "https://smart-drive-sandy.vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
