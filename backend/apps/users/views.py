@@ -89,7 +89,6 @@ class SendOtpView(GenericAPIView):
                 is_login = False
 
             otp = send_sms(phone)
-            print(f"Generated OTP for >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> {phone}: {otp}")  # Debug log
 
             if otp:
                 OtpVerification.objects.update_or_create(
@@ -102,7 +101,7 @@ class SendOtpView(GenericAPIView):
                     }
                 )
 
-            return Response({"message": "OTP sent successfully.", "otp_code": otp, "is_login": is_login}, status=status.HTTP_200_OK)
+            return Response({"message": "OTP sent successfully.", "is_login": is_login}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -157,7 +156,6 @@ class ForgotPasswordView(GenericAPIView):
 
             return Response({
                 "message": "OTP sent to your phone number.",
-                "otp_code": otp
             }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -284,7 +282,7 @@ class SendPhoneChangeOtpView(GenericAPIView):
                 )
 
             return Response(
-                {"message": "OTP sent successfully.", "otp_code": otp},
+                {"message": "OTP sent successfully."},
                 status=status.HTTP_200_OK
             )
 
