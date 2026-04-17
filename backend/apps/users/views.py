@@ -83,10 +83,13 @@ class SendOtpView(GenericAPIView):
             phone = serializer.validated_data['phone_number']
 
             user = User.objects.filter(phone_number=phone).first()
-            if user:
-                is_login = True
-            else:
-                is_login = False
+            is_registered = bool(user)
+
+            if is_registered:
+                return Response({
+                    "error": "User with this phone number already exists.",
+                    "is_registered": True
+                }, status=status.HTTP_400_BAD_REQUEST)
 
             otp = send_sms(phone)
 
@@ -101,7 +104,10 @@ class SendOtpView(GenericAPIView):
                     }
                 )
 
-            return Response({"message": "OTP sent successfully.", "is_login": is_login}, status=status.HTTP_200_OK)
+            return Response({
+                "message": "OTP sent successfully.", 
+                "is_registered": False
+            }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
