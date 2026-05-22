@@ -122,3 +122,4 @@ Thumbs.db
 # Secrets
 secrets.json
 *.secret
+backend/firebase/smart-drive.json
