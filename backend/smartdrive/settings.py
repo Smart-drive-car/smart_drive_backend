@@ -212,8 +212,10 @@ SPECTACULAR_SETTINGS = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),        # Access token 1 kun
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=180),     # Refresh token 180 kun (uzaytiriladi)
+    'ROTATE_REFRESH_TOKENS': True,                     # Har yangilanganda yangi refresh token berish (Rotation)
+    'BLACKLIST_AFTER_ROTATION': True,                  # Eski ishlatilgan tokenni blacklistga tushirish
 }
 
 LOGGING = {
